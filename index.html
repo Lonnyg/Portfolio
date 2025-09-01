@@ -62,15 +62,43 @@
     .img-skeleton{position:absolute;inset:0;background:linear-gradient(100deg,#f2f3f2 10%,#e6e7e6 30%,#f2f3f2 50%);background-size:200% 100%;animation:shimmer 1.2s infinite;}
     @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
-    /* Overlay (on-hover, on-focus, always-on for touch) */
-    .overlay{position:absolute;inset:auto 0 0 0;display:flex;align-items:flex-end;padding:10px 12px;background:linear-gradient(to top, rgba(0,0,0,.5), rgba(0,0,0,0));color:white;opacity:0;transition:opacity var(--transition)}
-    .overlay h3{margin:0;font-weight:700}
-    .card:focus-within .overlay,
-    .card:hover .overlay{opacity:1}
-    @media (hover:none){.overlay{opacity:1}}
 
-    .meta{padding:10px 12px 14px}
-    .reason{color:var(--ink);font-size:.95rem}
+/* Overlay (on-hover, on-focus, always-on for touch) */
+.overlay{
+  position:absolute; inset:auto 0 0 0;
+  display:flex; align-items:flex-end;
+  padding:10px 12px; color:#fff;
+  /* deeper gradient for better contrast */
+  background: linear-gradient(
+    to top,
+    rgba(0,0,0,.72),
+    rgba(0,0,0,.45) 40%,
+    rgba(0,0,0,0) 68%
+  );
+  opacity:0; transition:opacity var(--transition);
+}
+.overlay h3{
+  margin:0; font-weight:700; letter-spacing:.2px;
+  /* subtle shadow to separate type from image */
+  text-shadow: 0 1px 2px rgba(0,0,0,.5);
+}
+
+/* show overlay on focus/hover/touch */
+.card:focus-within .overlay,
+.card:hover .overlay{ opacity:1 }
+@media (hover:none){ .overlay{ opacity:1 } }
+
+/* users who prefer extra contrast */
+@media (prefers-contrast: more){
+  .overlay{
+    background: linear-gradient(
+      to top,
+      rgba(0,0,0,.85),
+      rgba(0,0,0,.55) 40%,
+      rgba(0,0,0,0) 70%
+    );
+  }
+}
 
     /* --- Modal / Lightbox --- */
     dialog{border:none;border-radius:18px;padding:0;max-width:min(860px,94vw);width:100%;box-shadow:0 30px 80px rgba(0,0,0,.35)}
