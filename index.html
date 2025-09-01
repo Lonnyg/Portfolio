@@ -8,6 +8,7 @@
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
     /* --- CSS Variables --- */
     :root{
@@ -102,6 +103,9 @@
     /* --- Utility --- */
     .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
   </style>
+
+  <!-- Load runtime config (CSV_URL lives here by default) -->
+  <script src="config.js"></script>
 </head>
 <body>
   <header>
@@ -167,11 +171,10 @@
 
   <script>
   // ==== CONFIG ====
-  // 1) Replace with your published Google Sheet CSV URL (File → Share → Publish to web → CSV)
-  const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRwYDBqR1Ig7T0gzs172Esm_cpJ28o8JwClwiiLtXQ65Fjd4_aVY13nKR3p_F6Qtpjq76p9yDYpsmFl/pub?output=csv"; // e.g., https://docs.google.com/spreadsheets/d/e/.../pub?output=csv
-
-  // 2) Optional: Set a default Open Graph image URL in your real deployment
-  // const DEFAULT_OG = "https://example.com/og-default.jpg";
+  // CSV priority: 1) ?csv=... in URL, 2) config.js, 3) empty (demo only if needed)
+  const CSV_URL = new URLSearchParams(location.search).get('csv')
+    || (window.PORTFOLIO_CONFIG && window.PORTFOLIO_CONFIG.CSV_URL)
+    || "";
 
   // ==== CSV PARSER (handles quotes, commas, newlines) ====
   function parseCSV(text){
@@ -193,9 +196,7 @@
       }
       i++;
     }
-    // flush last field/row
     if(field.length || row.length){ row.push(field); rows.push(row); }
-    // headers
     const headers = rows.shift().map(h => h.trim());
     return rows.filter(r => r.length && r.some(x => x && x.trim() !== ''))
       .map(r => Object.fromEntries(headers.map((h, idx) => [h, (r[idx] ?? '').trim()])));
@@ -216,58 +217,58 @@
     }).filter(x => x.url);
   }
 
-  // Coerce image URLs from common hosts (Google Drive, Dropbox, GitHub) to direct image links
+  // Convert common share URLs → direct image URLs (Drive/Dropbox/GitHub/Appropedia)
   function coerceImageURL(u){
-  if(!u) return '';
-  try{
-    // add protocol if missing
-    if(/^\/?\/?[^\s]+\.[^\s]+/.test(u) && !/^https?:/i.test(u)){
-      u = (u.startsWith('//') ? 'https:' : 'https://') + u.replace(/^\/+/, '');
-    }
-    const url = new URL(u);
-    const host = url.hostname;
-    const path = url.pathname;
-
-    // Google Drive → direct
-    if(host === 'drive.google.com'){
-      const m = path.match(/\/file\/d\/([^/]+)/);
-      const id = m ? m[1] : (url.searchParams.get('id') || '');
-      if(id) return `https://drive.google.com/uc?export=view&id=${id}`;
-    }
-
-    // Dropbox → raw
-    if(host.endsWith('dropbox.com')){
-      url.searchParams.delete('dl');
-      url.searchParams.set('raw','1');
-      return url.toString();
-    }
-
-    // GitHub blob → raw
-    if(host.endsWith('github.com') && path.includes('/blob/')){
-      return url.toString().replace('/blob/','/raw/');
-    }
-
-    // Appropedia File:... → Special:FilePath
-    if(host.endsWith('appropedia.org')){
-      const mFile = path.match(/^\/(wiki\/)?File:(.+)$/);
-      if(mFile){
-        const fname = mFile[2];
-        return `https://www.appropedia.org/Special:FilePath/${encodeURIComponent(fname)}`;
+    if(!u) return '';
+    try{
+      // add protocol if missing
+      if(/^\/?\/?[^\s]+\.[^\s]+/.test(u) && !/^https?:/i.test(u)){
+        u = (u.startsWith('//') ? 'https:' : 'https://') + u.replace(/^\/+/, '');
       }
-    }
+      const url = new URL(u);
+      const host = url.hostname;
+      const path = url.pathname;
 
-    // Google Photos won’t hotlink
-    if(host === 'photos.google.com' || host === 'photos.app.goo.gl'){
-      console.warn('Google Photos share links do not hotlink. Use a direct lh3.googleusercontent.com URL:', u);
-    }
+      // Google Drive → direct view
+      if(host === 'drive.google.com'){
+        const m = path.match(/\/file\/d\/([^/]+)/);
+        const id = m ? m[1] : (url.searchParams.get('id') || '');
+        if(id) return `https://drive.google.com/uc?export=view&id=${id}`;
+      }
 
-    return u;
-  }catch(e){
-    return u;
+      // Dropbox share → raw
+      if(host.endsWith('dropbox.com')){
+        url.searchParams.delete('dl');
+        url.searchParams.set('raw','1');
+        return url.toString();
+      }
+
+      // GitHub blob → raw
+      if(host.endsWith('github.com') && path.includes('/blob/')){
+        return url.toString().replace('/blob/','/raw/');
+      }
+
+      // Appropedia File:... → Special:FilePath
+      if(host.endsWith('appropedia.org')){
+        const mFile = path.match(/^\/(wiki\/)?File:(.+)$/);
+        if(mFile){
+          const fname = mFile[2];
+          return `https://www.appropedia.org/Special:FilePath/${encodeURIComponent(fname)}`;
+        }
+      }
+
+      // Google Photos won’t hotlink
+      if(host === 'photos.google.com' || host === 'photos.app.goo.gl'){
+        console.warn('Google Photos share links do not hotlink. Use a direct lh3.googleusercontent.com URL instead:', u);
+      }
+
+      return u;
+    }catch(e){
+      return u;
+    }
   }
-}
 
-  // Helper: extract Google Drive file ID from common URLs
+  // Extract Drive ID for thumbnail fallback
   function extractDriveId(u){
     if(!u) return '';
     try{
@@ -280,7 +281,7 @@
     }catch(e){ return ''; }
   }
 
-  // Additional helper (tolerant field lookup for varied Sheet headers)
+  // Tolerant field lookup (handles header variants)
   function pickField(r, names){
     for(const k of names){ if(r[k] && String(r[k]).trim() !== '') return String(r[k]).trim(); }
     return '';
@@ -312,25 +313,27 @@
       img.referrerPolicy = 'no-referrer';
       const resolvedSrc = coerceImageURL(item.image || '');
       img.src = resolvedSrc;
+
       img.addEventListener('load', () => skel.remove());
+
       img.addEventListener('error', () => {
-      // Try Google Drive thumbnail fallback once if applicable
-      const driveId = extractDriveId(item.image || resolvedSrc);
-      if(driveId && !img.dataset.driveTried){
-        img.dataset.driveTried = '1';
-        img.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1600`;
-        return;
-      }
-      console.warn('Image failed to load. Original:', item.image, 'Resolved:', resolvedSrc);
-      skel.remove();
-      const thumb = img.closest('.thumb');
-      img.remove();
-      const fallback = document.createElement('div');
-      fallback.setAttribute('aria-hidden','true');
-      fallback.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#e5e7eb;color:#6b7280;font-weight:600;font-size:0.95rem;';
-      fallback.textContent = 'Image unavailable';
-      thumb.appendChild(fallback);
-    });
+        // Try Google Drive thumbnail once if applicable
+        const driveId = extractDriveId(item.image || resolvedSrc);
+        if(driveId && !img.dataset.driveTried){
+          img.dataset.driveTried = '1';
+          img.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1600`;
+          return;
+        }
+        console.warn('Image failed to load. Original:', item.image, 'Resolved:', resolvedSrc);
+        skel.remove();
+        const thumb = img.closest('.thumb');
+        img.remove();
+        const fallback = document.createElement('div');
+        fallback.setAttribute('aria-hidden','true');
+        fallback.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#e5e7eb;color:#6b7280;font-weight:600;font-size:0.95rem;';
+        fallback.textContent = 'Image unavailable';
+        thumb.appendChild(fallback);
+      });
 
       btn.setAttribute('aria-label', `Open project: ${item.title}`);
       btn.addEventListener('click', (e) => { e.preventDefault(); openModalBySlug(item.slug); });
@@ -375,7 +378,6 @@
     const item = PROJECTS.find(p => p.slug === slug);
     if(!item) return;
     fillModal(item);
-    // push hash for deep link
     if(location.hash !== `#/project/${slug}`){
       PREV_HASH = location.hash;
       location.hash = `#/project/${slug}`;
@@ -386,7 +388,6 @@
 
   function closeModal(){
     if(dialog.open) dialog.close();
-    // restore previous hash (or clear)
     if(PREV_HASH && PREV_HASH !== `#/project/${getHashSlug()}`){
       location.hash = PREV_HASH;
     } else if(location.hash.startsWith('#/project/')){
@@ -405,7 +406,7 @@
     else { if(dialog.open) dialog.close(); }
   });
 
-  // ---- Focus trap ----
+  // Focus trap
   function trapFocus(root){
     const FOCUSABLE = 'a[href],button:not([disabled]),textarea,input,select,details,[tabindex]:not([tabindex="-1"])';
     const focusables = [...root.querySelectorAll(FOCUSABLE)].filter(el => el.offsetParent !== null);
@@ -420,40 +421,39 @@
     root.addEventListener('keydown', onKey, { once: true });
   }
 
-  // ==== Boot ==== 
+  // ==== Boot ====
   async function boot(){
     try{
-      if(location.protocol === 'file:'){ console.warn('Tip: serve this over http(s) (e.g., python3 -m http.server) so cross-origin fetch works reliably.'); }
-      if(!CSV_URL || CSV_URL.includes('PASTE_YOUR')){
-        console.warn('Set CSV_URL to your published Google Sheet CSV link. Using demo rows.');
-        const demo = `slug,image,title,reason,description,impacts,dates,roles,links,tags,order_weight,published,created_at,updated_at\n`+
-          `waterpod,https://picsum.photos/seed/waterpod/1600/900,Waterpod,A floating, self-sufficient habitat and public art platform.,Waterpod was a sustainable, mobile living space that hosted public programming and explored urban resilience.,Thousands of visitors; educational programming.,2009,Designer; Educator,Appropedia|https://www.appropedia.org/Waterpod; Video|https://example.com,installation;education,10,true,2025-08-31,2025-08-31\n`+
-          `swale,https://picsum.photos/seed/swale/1600/900,Swale,A floating food forest offering free public harvests.,Swale invited the public to engage with urban agriculture and shared resources.,Policy conversations and education collaborations.,2016–2019,Collaborator; Educator,Appropedia|https://www.appropedia.org/Swale,food;education,20,true,2025-08-31,2025-08-31`;
-        const rows = parseCSV(demo);
-        hydrate(rows);
-      } else {
-        let text;
-        try {
-          const res = await fetch(CSV_URL); // direct fetch
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          text = await res.text();
-        } catch (e) {
-          console.warn('Direct CSV fetch failed, trying CORS proxy…', e);
-          const proxied = `https://api.allorigins.win/raw?url=${encodeURIComponent(CSV_URL)}`;
-          const res2 = await fetch(proxied);
-          if (!res2.ok) throw new Error(`HTTP ${res2.status} via proxy`);
-          text = await res2.text();
-        }
-        const rows = parseCSV(text);
-        hydrate(rows);
+      if(location.protocol === 'file:'){
+        console.warn('Tip: serve this over http(s) (e.g., python3 -m http.server) so cross-origin fetch works reliably.');
       }
+
+      if(!CSV_URL){
+        console.warn('CSV_URL is empty. Set it in config.js or pass ?csv=...');
+      }
+
+      let text;
+      try {
+        const res = await fetch(CSV_URL); // direct fetch
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        text = await res.text();
+      } catch (e) {
+        console.warn('Direct CSV fetch failed, trying CORS proxy…', e);
+        const proxied = `https://api.allorigins.win/raw?url=${encodeURIComponent(CSV_URL)}`;
+        const res2 = await fetch(proxied);
+        if (!res2.ok) throw new Error(`HTTP ${res2.status} via proxy`);
+        text = await res2.text();
+      }
+
+      const rows = parseCSV(text);
+      hydrate(rows);
     } catch(err){
       console.error(err);
       const msg = `Could not load projects. ${err && err.message ? '('+err.message+')' : ''}`;
       grid.innerHTML = `<div style="padding:12px;border:1px solid var(--border);border-radius:12px;background:#fff">
         <p>${msg}</p>
         <p><small>CSV_URL:</small> <code>${CSV_URL}</code></p>
-        <p><small>Tips:</small> Publish the Sheet to the web as CSV; test the link in a new tab; and serve this file over http(s) with a simple local server. If CORS blocks direct fetch, this starter will try a temporary proxy (api.allorigins.win). For production, consider your own tiny proxy (Cloudflare Worker/Netlify Function).</p>
+        <p><small>Tips:</small> Publish the Sheet to the web as CSV; test the link in a new tab; and serve this file over http(s) with a simple local server. If CORS blocks direct fetch, a temporary proxy (api.allorigins.win) is used. For production, consider your own tiny proxy (Cloudflare Worker/Netlify Function).</p>
       </div>`;
     }
   }
@@ -493,7 +493,9 @@
 
     renderGrid(PROJECTS);
 
-    if(PROJECTS.length === 0){ grid.innerHTML = '<p>No published projects found. Check your Sheet headers and set <code>published</code> to TRUE.</p>'; }
+    if(PROJECTS.length === 0){
+      grid.innerHTML = '<p>No published projects found. Check your Sheet headers and set <code>published</code> to TRUE.</p>';
+    }
 
     // if URL has a deep link on load, open it
     const slug = getHashSlug();
