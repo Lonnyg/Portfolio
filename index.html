@@ -19,9 +19,10 @@
       --punk:#A3E635; /* tiny accents/focus ring */
       --card:#FFFFFF;
       --border:rgba(17,24,39,0.08);
-      --shadow:0 4px 20px rgba(0,0,0,.08);
-      --radius:16px;
-      --gap:20px;
+      --shadow:0 2px 8px rgba(0,0,0,.06), 0 1px 0 rgba(0,0,0,.02);
+      --shadow-hover:0 12px 34px rgba(0,0,0,.18), 0 6px 18px rgba(0,0,0,.08);
+      --radius:18px;
+      --gap:clamp(12px, 2.2vw, 20px);
       --transition:150ms cubic-bezier(.2,.6,.2,1);
     }
 
@@ -29,15 +30,16 @@
     html,body{height:100%;}
     body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;}
     h1,h2,h3{color:var(--charcoal);line-height:1.2;margin:0 0 .6rem;}
-    h1{font-size:clamp(1.5rem,2.5vw,2.2rem);font-weight:800}
-    h2{font-size:clamp(1.25rem,1.8vw,1.6rem);font-weight:700}
-    h3{font-size:1rem;font-weight:700}
+    h1{font-size:clamp(1.6rem,2.4vw,2.3rem);font-weight:800}
+    h2{font-size:clamp(1.2rem,1.7vw,1.5rem);font-weight:700}
+    h3{font-size:clamp(1rem,1.2vw,1.05rem);font-weight:700}
     p{margin:.5rem 0 0}
     a{color:var(--accent);text-decoration:none}
     a:hover{text-decoration:underline}
 
     /* --- Layout --- */
-    header{position:sticky;top:0;z-index:20;background:color-mix(in oklab, var(--paper) 92%, white 8%);backdrop-filter:saturate(1.1) blur(6px);border-bottom:1px solid var(--border)}
+    header{position:sticky;top:0;z-index:20;background:color-mix(in oklab, var(--paper) 92%, white 8%);backdrop-filter:saturate(1.1) blur(6px);border-bottom:1px solid var(--border);
+      transition:background var(--transition), border-color var(--transition), box-shadow var(--transition)}
     .wrap{max-width:1200px;margin:0 auto;padding:14px 18px}
     nav{display:flex;gap:18px;align-items:center}
     nav a{font-weight:600;color:var(--charcoal);padding:8px 10px;border-radius:10px}
@@ -45,6 +47,11 @@
 
     main{padding:24px 18px 80px}
     .section{max-width:1200px;margin:0 auto}
+
+    /* compact header on scroll */
+    body.is-scrolled header{background:color-mix(in oklab, var(--paper) 88%, white 12%);border-bottom-color:rgba(17,24,39,0.12);box-shadow:0 6px 18px rgba(0,0,0,.08)}
+    body.is-scrolled header .wrap{padding:8px 18px}
+    @media (prefers-reduced-motion:reduce){header,.wrap{transition:none !important}}
 
     /* --- Grid (Option A) --- */
     .grid{display:grid;gap:var(--gap)}
@@ -55,50 +62,45 @@
     @media (max-width:519px){.grid{grid-template-columns:1fr}}
 
     /* --- Card / Tile --- */
-    .card{display:block;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;transition:transform var(--transition), box-shadow var(--transition)}
-    .card:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,0,0,.1)}
+    .card{display:block;background:var(--card);border:1px solid rgba(17,24,39,0.12);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;transition:transform var(--transition), box-shadow var(--transition), border-color var(--transition);will-change:transform}
+    .card:hover{transform:translateY(-3px) scale(1.01);box-shadow:var(--shadow-hover)}
+    .card:focus-within{transform:translateY(-2px) scale(1.005);box-shadow:var(--shadow-hover)}
+    .card:active{transform:translateY(-1px) scale(1.003)}
     .thumb{position:relative;aspect-ratio:16/9;background:#e5e7eb;overflow:hidden}
-    .thumb img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.02)}
+    .thumb img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.02);transition:transform var(--transition);transform:scale(1)}
+    .card:hover .thumb img{transform:scale(1.02)}
     .img-skeleton{position:absolute;inset:0;background:linear-gradient(100deg,#f2f3f2 10%,#e6e7e6 30%,#f2f3f2 50%);background-size:200% 100%;animation:shimmer 1.2s infinite;}
     @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
+    /* Overlay (on-hover, on-focus, always-on for touch) */
+    .overlay{
+      position:absolute; inset:auto 0 0 0;
+      display:flex; align-items:flex-end;
+      padding:10px 12px; color:#fff;
+      background: linear-gradient(
+        to top,
+        rgba(0,0,0,.72),
+        rgba(0,0,0,.45) 40%,
+        rgba(0,0,0,0) 68%
+      );
+      opacity:0; transition:opacity var(--transition)
+    }
+    .overlay h3{margin:0;font-weight:700;letter-spacing:.2px;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+    .card:focus-within .overlay,.card:hover .overlay{opacity:1}
+    @media (hover:none){.overlay{opacity:1}}
+    @media (prefers-contrast: more){
+      .overlay{
+        background: linear-gradient(
+          to top,
+          rgba(0,0,0,.85),
+          rgba(0,0,0,.55) 40%,
+          rgba(0,0,0,0) 70%
+        );
+      }
+    }
 
-/* Overlay (on-hover, on-focus, always-on for touch) */
-.overlay{
-  position:absolute; inset:auto 0 0 0;
-  display:flex; align-items:flex-end;
-  padding:10px 12px; color:#fff;
-  /* deeper gradient for better contrast */
-  background: linear-gradient(
-    to top,
-    rgba(0,0,0,.72),
-    rgba(0,0,0,.45) 40%,
-    rgba(0,0,0,0) 68%
-  );
-  opacity:0; transition:opacity var(--transition);
-}
-.overlay h3{
-  margin:0; font-weight:700; letter-spacing:.2px;
-  /* subtle shadow to separate type from image */
-  text-shadow: 0 1px 2px rgba(0,0,0,.5);
-}
-
-/* show overlay on focus/hover/touch */
-.card:focus-within .overlay,
-.card:hover .overlay{ opacity:1 }
-@media (hover:none){ .overlay{ opacity:1 } }
-
-/* users who prefer extra contrast */
-@media (prefers-contrast: more){
-  .overlay{
-    background: linear-gradient(
-      to top,
-      rgba(0,0,0,.85),
-      rgba(0,0,0,.55) 40%,
-      rgba(0,0,0,0) 70%
-    );
-  }
-}
+    .meta{padding:12px 12px 16px}
+    .reason{color:var(--ink);font-size:.95rem;line-height:1.45}
 
     /* --- Modal / Lightbox --- */
     dialog{border:none;border-radius:18px;padding:0;max-width:min(860px,94vw);width:100%;box-shadow:0 30px 80px rgba(0,0,0,.35)}
@@ -107,200 +109,52 @@
     .modal header{position:sticky;top:0;background:var(--card);border-bottom:1px solid var(--border);border-radius:18px 18px 0 0}
     .modal .head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px}
     .modal .title{margin:0;font-size:1.4rem}
-    .close-btn{appearance:none;border:none;background:transparent;font-size:1.5rem;line-height:1;padding:6px 8px;border-radius:8px;cursor:pointer;color:var(--charcoal)}
-    .close-btn:focus-visible{outline:2px solid var(--punk);outline-offset:2px}
-    .modal .body{padding:18px}
-    .muted{color:#6B7280}
-    .meta-row{margin-top:10px;color:#4B5563;font-size:.95rem}
-    .links{margin-top:12px;display:flex;flex-wrap:wrap;gap:10px}
-    .links a{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);border-radius:10px;background:#fff;transition:background var(--transition)}
+    .close-btn{
+      appearance:none;border:none;background:transparent;font-size:1.5rem;line-height:1;
+      padding:10px 12px;min-width:44px;min-height:44px;border-radius:10px;cursor:pointer;color:var(--charcoal)
+    }
+    .close-btn:focus-visible{outline:2px solid var(--punk);outline-offset:3px}
+    .modal .body{padding:20px 22px 22px}
+    .muted{color:#6B7280;font-size:.95rem}
+    .meta-row{margin-top:12px;color:#4B5563;font-size:.95rem;line-height:1.4}
+    .links{margin-top:14px;display:flex;flex-wrap:wrap;gap:12px}
+    .links a{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;transition:background var(--transition);font-weight:600}
     .links a:hover{background:#fafafa}
+
+    /* Modal field groups (titles before text) */
+    .field{margin-top:14px}
+    .field h4{margin:0 0 6px;font-size:1rem;color:var(--charcoal)}
+    .field p{margin:0;color:var(--ink);line-height:1.5}
 
     /* --- Sections for About/Contact (simple placeholders) --- */
     #about, #contact{margin-top:56px;padding-top:16px}
     .lead{font-family:"Crimson Pro", serif;font-size:1.1rem;color:var(--charcoal)}
 
-    /* --- Focus styles --- */
-    :focus-visible{outline:2px solid var(--punk);outline-offset:2px}
-
-    /* --- Reduced motion --- */
-    @media (prefers-reduced-motion:reduce){
-      *{animation:none!important;transition:none!important}
-    }
-
-    /* --- Utility --- */
-    /* --- Footer --- */
+    /* Footer */
     footer{border-top:1px solid var(--border);margin-top:48px}
     footer .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:18px}
     .footer-links{display:flex;gap:14px;flex-wrap:wrap}
     .footer-links a{color:var(--ink);font-weight:600}
     .footer-links a:focus-visible{outline:2px solid var(--punk);outline-offset:2px}
     .footer-copy{color:#6B7280;font-size:.9rem}
+
+    /* Focus styles */
+    :focus-visible{outline:2px solid var(--punk);outline-offset:2px}
+    .tile-btn:focus-visible{outline:2px solid var(--punk);outline-offset:4px;border-radius:var(--radius)}
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion:reduce){
+      *{animation:none!important;transition:none!important}
+      .card,.card:hover,.card:focus-within,.card:active{transform:none!important}
+      .thumb img{transform:none!important}
+    }
+
+    /* Utility */
     .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
   </style>
 
   <!-- Load runtime config (CSV_URL lives here by default) -->
   <script src="config.js"></script>
-<!-- UI polish pack 01 — safe overrides (append-only) -->
-<style id="ui-polish-01">
-  /* Vars: responsive gap + slightly larger radius */
-  :root{
-    --radius: 18px;
-    --gap: clamp(12px, 2.2vw, 20px);
-  }
-
-  /* Overlay: stronger gradient + subtle type shadow for AA/AAA */
-  .overlay{
-    position:absolute; inset:auto 0 0 0;
-    display:flex; align-items:flex-end;
-    padding:10px 12px; color:#fff;
-    background: linear-gradient(
-      to top,
-      rgba(0,0,0,.72),
-      rgba(0,0,0,.45) 40%,
-      rgba(0,0,0,0) 68%
-    );
-    opacity:0; transition:opacity var(--transition);
-  }
-  .overlay h3{
-    margin:0; font-weight:700; letter-spacing:.2px;
-    text-shadow: 0 1px 2px rgba(0,0,0,.5);
-  }
-  .card:focus-within .overlay,
-  .card:hover .overlay{ opacity:1 }
-  @media (hover:none){ .overlay{ opacity:1 } }
-  @media (prefers-contrast: more){
-    .overlay{
-      background: linear-gradient(
-        to top,
-        rgba(0,0,0,.85),
-        rgba(0,0,0,.55) 40%,
-        rgba(0,0,0,0) 70%
-      );
-    }
-  }
-
-  /* Heading scale: subtle hierarchy improvements */
-  h1{font-size:clamp(1.6rem,2.4vw,2.3rem);font-weight:800}
-  h2{font-size:clamp(1.2rem,1.7vw,1.5rem);font-weight:700}
-  h3{font-size:clamp(1rem,1.2vw,1.05rem);font-weight:700}
-
-  /* Tile text rhythm */
-  .meta{padding:12px 12px 16px}
-  .reason{color:var(--ink);font-size:.95rem;line-height:1.45}
-
-  /* Modal typography & links */
-  .modal .body{padding:20px 22px 22px}
-  .muted{color:#6B7280;font-size:.95rem}
-  .meta-row{margin-top:12px;color:#4B5563;font-size:.95rem;line-height:1.4}
-  .links{margin-top:14px;display:flex;flex-wrap:wrap;gap:12px}
-  .links a{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;transition:background var(--transition);font-weight:600}
-  .links a:hover{background:#fafafa}
-
-  /* Close button: bigger tap target */
-  .close-btn{
-    appearance:none;border:none;background:transparent;
-    font-size:1.5rem;line-height:1;
-    padding:10px 12px; min-width:44px; min-height:44px;
-    border-radius:10px; cursor:pointer; color:var(--charcoal)
-  }
-  .close-btn:focus-visible{outline:2px solid var(--punk);outline-offset:3px}
-
-  /* Keyboard focus ring on tiles */
-  .tile-btn:focus-visible{
-    outline:2px solid var(--punk);
-    outline-offset:4px;
-    border-radius:var(--radius);
-  }
-</style>
-
-<!-- UI polish 02 — card shadow & hover depth (append-only) -->
-<style id="ui-polish-02">
-  /* Shadow tokens */
-  :root{
-    --shadow:        0 2px 8px rgba(0,0,0,.06), 0 1px 0 rgba(0,0,0,.02);
-    --shadow-hover:  0 12px 34px rgba(0,0,0,.18), 0 6px 18px rgba(0,0,0,.08);
-    --border-strong: rgba(17,24,39,0.12);
-  }
-
-  /* Base card refresh */
-  .card{
-    box-shadow: var(--shadow);
-    border-color: var(--border-strong);
-    transform: translateY(0) scale(1);
-    transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
-    will-change: transform;
-  }
-
-  /* Subtle image zoom on hover for depth */
-  .thumb img{
-    transition: transform var(--transition);
-    transform: scale(1);
-  }
-
-  /* Elevate on hover (pointer/hover devices only) */
-  @media (hover:hover){
-    .card:hover{
-      transform: translateY(-3px) scale(1.01);
-      box-shadow: var(--shadow-hover);
-      border-color: var(--border-strong);
-    }
-    .card:hover .thumb img{
-      transform: scale(1.02);
-    }
-  }
-
-  /* Elevate when tile is focused via keyboard (accessibility) */
-  .card:focus-within{
-    transform: translateY(-2px) scale(1.005);
-    box-shadow: var(--shadow-hover);
-    border-color: var(--border-strong);
-  }
-
-  /* Active press gives a tiny dip for tactile feel */
-  .card:active{
-    transform: translateY(-1px) scale(1.003);
-  }
-
-  /* Respect reduced motion: keep shadows, ditch transforms */
-  @media (prefers-reduced-motion: reduce){
-    .card,
-    .card:hover,
-    .card:focus-within,
-    .card:active{
-      transform: none !important;
-      transition: box-shadow var(--transition);
-    }
-    .thumb img{ transform: none !important; }
-  }
-</style>
-
-<!-- UI polish 03 — compact sticky header on scroll -->
-<style id="ui-polish-03">
-  header{
-    transition:
-      background var(--transition),
-      border-color var(--transition),
-      box-shadow var(--transition);
-  }
-  header .wrap{
-    transition: padding var(--transition);
-  }
-
-  /* When scrolled: slightly denser header + subtle shadow */
-  body.is-scrolled header{
-    background: color-mix(in oklab, var(--paper) 88%, white 12%);
-    border-bottom-color: rgba(17,24,39,0.12);
-    box-shadow: 0 6px 18px rgba(0,0,0,.08);
-  }
-  body.is-scrolled header .wrap{
-    padding: 8px 18px; /* was 14px 18px */
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    header, header .wrap{ transition: none !important; }
-  }
-</style>
 </head>
 <body>
   <header>
@@ -341,10 +195,29 @@
         </div>
       </header>
       <div class="body">
-        <p class="muted" id="modal-reason"></p>
-        <p id="modal-description"></p>
-        <p id="modal-impacts"></p>
-        <p class="meta-row"><span id="modal-dates"></span> <span id="modal-roles"></span></p>
+        <!-- Titles before text -->
+        <div class="field" id="field-reason">
+          <h4>Reason</h4>
+          <p class="muted" id="modal-reason"></p>
+        </div>
+
+        <div class="field" id="field-description">
+          <h4>Description</h4>
+          <p id="modal-description"></p>
+        </div>
+
+        <div class="field" id="field-impacts">
+          <h4>Impacts</h4>
+          <p id="modal-impacts"></p>
+        </div>
+
+        <div class="field" id="field-roles">
+          <h4>Roles</h4>
+          <p id="modal-roles"></p>
+        </div>
+
+        <p class="meta-row" id="field-dates"><span id="modal-dates"></span></p>
+
         <div class="links" id="modal-links"></div>
       </div>
     </div>
@@ -366,7 +239,7 @@
 
   <script>
   // ==== CONFIG ====
-  // CSV priority: 1) ?csv=... in URL, 2) config.js, 3) empty (demo only if needed)
+  // CSV priority: 1) ?csv=... in URL, 2) config.js, 3) empty (warn)
   const CSV_URL = new URLSearchParams(location.search).get('csv')
     || (window.PORTFOLIO_CONFIG && window.PORTFOLIO_CONFIG.CSV_URL)
     || "";
@@ -416,7 +289,6 @@
   function coerceImageURL(u){
     if(!u) return '';
     try{
-      // add protocol if missing
       if(/^\/?\/?[^\s]+\.[^\s]+/.test(u) && !/^https?:/i.test(u)){
         u = (u.startsWith('//') ? 'https:' : 'https://') + u.replace(/^\/+/, '');
       }
@@ -424,26 +296,18 @@
       const host = url.hostname;
       const path = url.pathname;
 
-      // Google Drive → direct view
       if(host === 'drive.google.com'){
         const m = path.match(/\/file\/d\/([^/]+)/);
         const id = m ? m[1] : (url.searchParams.get('id') || '');
         if(id) return `https://drive.google.com/uc?export=view&id=${id}`;
       }
-
-      // Dropbox share → raw
       if(host.endsWith('dropbox.com')){
-        url.searchParams.delete('dl');
-        url.searchParams.set('raw','1');
+        url.searchParams.delete('dl'); url.searchParams.set('raw','1');
         return url.toString();
       }
-
-      // GitHub blob → raw
       if(host.endsWith('github.com') && path.includes('/blob/')){
         return url.toString().replace('/blob/','/raw/');
       }
-
-      // Appropedia File:... → Special:FilePath
       if(host.endsWith('appropedia.org')){
         const mFile = path.match(/^\/(wiki\/)?File:(.+)$/);
         if(mFile){
@@ -451,19 +315,13 @@
           return `https://www.appropedia.org/Special:FilePath/${encodeURIComponent(fname)}`;
         }
       }
-
-      // Google Photos won’t hotlink
       if(host === 'photos.google.com' || host === 'photos.app.goo.gl'){
         console.warn('Google Photos share links do not hotlink. Use a direct lh3.googleusercontent.com URL instead:', u);
       }
-
       return u;
-    }catch(e){
-      return u;
-    }
+    }catch(e){ return u; }
   }
 
-  // Extract Drive ID for thumbnail fallback
   function extractDriveId(u){
     if(!u) return '';
     try{
@@ -476,7 +334,7 @@
     }catch(e){ return ''; }
   }
 
-  // Tolerant field lookup (handles header variants)
+  // Tolerant field lookup
   function pickField(r, names){
     for(const k of names){ if(r[k] && String(r[k]).trim() !== '') return String(r[k]).trim(); }
     return '';
@@ -510,9 +368,7 @@
       img.src = resolvedSrc;
 
       img.addEventListener('load', () => skel.remove());
-
       img.addEventListener('error', () => {
-        // Try Google Drive thumbnail once if applicable
         const driveId = extractDriveId(item.image || resolvedSrc);
         if(driveId && !img.dataset.driveTried){
           img.dataset.driveTried = '1';
@@ -540,25 +396,51 @@
   // ==== Modal Logic ====
   const dialog = document.getElementById('project-modal');
   const titleOut = document.getElementById('modal-title');
-  const reasonOut = document.getElementById('modal-reason');
-  const descOut = document.getElementById('modal-description');
-  const impOut = document.getElementById('modal-impacts');
-  const datesOut = document.getElementById('modal-dates');
-  const rolesOut = document.getElementById('modal-roles');
-  const linksOut = document.getElementById('modal-links');
-  const closeBtn = dialog.querySelector('[data-close]');
 
+  // field containers + outputs
+  const fieldReason = document.getElementById('field-reason');
+  const fieldDesc   = document.getElementById('field-description');
+  const fieldImp    = document.getElementById('field-impacts');
+  const fieldRoles  = document.getElementById('field-roles');
+  const fieldDates  = document.getElementById('field-dates');
+
+  const reasonOut = document.getElementById('modal-reason');
+  const descOut   = document.getElementById('modal-description');
+  const impOut    = document.getElementById('modal-impacts');
+  const rolesOut  = document.getElementById('modal-roles');
+  const datesOut  = document.getElementById('modal-dates');
+  const linksOut  = document.getElementById('modal-links');
+
+  const closeBtn = dialog.querySelector('[data-close]');
   closeBtn.addEventListener('click', closeModal);
   dialog.addEventListener('cancel', (e) => { e.preventDefault(); closeModal(); }); // ESC
   dialog.addEventListener('click', (e) => { if(e.target === dialog) closeModal(); });
 
+  function setField(container, el, value){
+    if(value && String(value).trim() !== ''){
+      container.style.display = '';
+      el.textContent = value;
+    }else{
+      container.style.display = 'none';
+      el.textContent = '';
+    }
+  }
+
   function fillModal(item){
     titleOut.textContent = item.title || 'Untitled';
-    reasonOut.textContent = item.reason || '';
-    descOut.textContent = item.description || '';
-    impOut.textContent = item.impacts || '';
-    datesOut.textContent = item.dates ? `Dates: ${item.dates}` : '';
-    rolesOut.textContent = item.roles ? ` • Roles: ${item.roles}` : '';
+    setField(fieldReason, reasonOut, item.reason);
+    setField(fieldDesc,   descOut,   item.description);
+    setField(fieldImp,    impOut,    item.impacts);
+    setField(fieldRoles,  rolesOut,  item.roles);
+
+    // Dates display remains simple (not requested to title)
+    if(item.dates && item.dates.trim() !== ''){
+      fieldDates.style.display = '';
+      datesOut.textContent = `Dates: ${item.dates}`;
+    }else{
+      fieldDates.style.display = 'none';
+      datesOut.textContent = '';
+    }
 
     linksOut.innerHTML = '';
     for(const link of parseLinks(item.links)){
@@ -622,10 +504,7 @@
       if(location.protocol === 'file:'){
         console.warn('Tip: serve this over http(s) (e.g., python3 -m http.server) so cross-origin fetch works reliably.');
       }
-
-      if(!CSV_URL){
-        console.warn('CSV_URL is empty. Set it in config.js or pass ?csv=...');
-      }
+      if(!CSV_URL){ console.warn('CSV_URL is empty. Set it in config.js or pass ?csv=...'); }
 
       let text;
       try {
@@ -644,11 +523,12 @@
       hydrate(rows);
     } catch(err){
       console.error(err);
+      const grid = document.getElementById('grid');
       const msg = `Could not load projects. ${err && err.message ? '('+err.message+')' : ''}`;
       grid.innerHTML = `<div style="padding:12px;border:1px solid var(--border);border-radius:12px;background:#fff">
         <p>${msg}</p>
         <p><small>CSV_URL:</small> <code>${CSV_URL}</code></p>
-        <p><small>Tips:</small> Publish the Sheet to the web as CSV; test the link in a new tab; and serve this file over http(s) with a simple local server. If CORS blocks direct fetch, a temporary proxy (api.allorigins.win) is used. For production, consider your own tiny proxy (Cloudflare Worker/Netlify Function).</p>
+        <p><small>Tips:</small> Publish the Sheet to the web as CSV; test the link in a new tab; and serve this file over http(s). A temporary proxy (api.allorigins.win) is used if CORS blocks direct fetch.</p>
       </div>`;
     }
   }
@@ -669,16 +549,7 @@
       const publishedRaw = pick(r,['published','Published','publish','Publish']);
       const orderRaw = pick(r,['order_weight','order','Order','weight','Weight']);
       return {
-        slug,
-        image,
-        title,
-        reason,
-        description,
-        impacts,
-        dates,
-        roles,
-        links,
-        tags,
+        slug,image,title,reason,description,impacts,dates,roles,links,tags,
         order_weight: toNumber(orderRaw),
         published: normalizeBool(publishedRaw)
       };
@@ -692,38 +563,39 @@
       grid.innerHTML = '<p>No published projects found. Check your Sheet headers and set <code>published</code> to TRUE.</p>';
     }
 
-    // if URL has a deep link on load, open it
     const slug = getHashSlug();
     if(slug) openModalBySlug(slug);
   }
 
   boot();
-    // Footer year
-document.addEventListener('DOMContentLoaded', () => {
-  const y = document.getElementById('year');
-  if (y) y.textContent = new Date().getFullYear();
-});
 
-// Compact header on scroll
-(() => {
-  const toggle = () => document.body.classList.toggle('is-scrolled', window.scrollY > 6);
-  toggle();
-  window.addEventListener('scroll', toggle, { passive: true });
-})();
+  // Footer year
+  document.addEventListener('DOMContentLoaded', () => {
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  });
 
+  // Compact header on scroll
+  (() => {
+    const toggle = () => document.body.classList.toggle('is-scrolled', window.scrollY > 6);
+    toggle();
+    window.addEventListener('scroll', toggle, { passive: true });
+  })();
   </script>
 
-  <!-- GA4 (optional): paste your GA snippet here when deploying) -->
-<footer>
-  <div class="wrap">
-    <div class="footer-links" aria-label="Social links">
-      <a href="https://instagram.com/lonnygrafman" target="_blank" rel="noopener">Instagram</a>
-      <a href="https://www.linkedin.com/in/lonnygrafman/" target="_blank" rel="noopener">LinkedIn</a>
-      <a href="https://www.facebook.com/LonnyG" target="_blank" rel="noopener">Facebook</a>
-      <a href="https://www.youtube.com/user/LonnyGrafman" target="_blank" rel="noopener">YouTube</a>
+  <!-- Footer -->
+  <footer>
+    <div class="wrap">
+      <div class="footer-links" aria-label="Social links">
+        <a href="https://instagram.com/lonnygrafman" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.linkedin.com/in/lonnygrafman/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://www.facebook.com/LonnyG" target="_blank" rel="noopener">Facebook</a>
+        <a href="https://www.youtube.com/user/LonnyGrafman" target="_blank" rel="noopener">YouTube</a>
+      </div>
+      <div class="footer-copy">© <span id="year"></span> Lonny Grafman</div>
     </div>
-    <div class="footer-copy">© <span id="year"></span> Lonny Grafman</div>
-  </div>
-</footer>
+  </footer>
+
+  <!-- GA4 (optional): paste your GA snippet here when deploying) -->
 </body>
 </html>
