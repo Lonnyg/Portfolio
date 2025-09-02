@@ -16,7 +16,7 @@
       --charcoal:#111827; /* headings/text */
       --ink:#374151; /* body text */
       --accent:#0EA5A4; /* links, hovers */
-      --punk:#A3E635; /* tiny accents/focus ring */
+      --punk:#A3E635; /* focus ring */
       --card:#FFFFFF;
       --border:rgba(17,24,39,0.08);
       --shadow:0 2px 8px rgba(0,0,0,.06), 0 1px 0 rgba(0,0,0,.02);
@@ -102,7 +102,7 @@
     .meta{padding:12px 12px 16px}
     .reason{color:var(--ink);font-size:.95rem;line-height:1.45}
 
-    /* --- Modal / Lightbox --- */
+    /* --- Modal / Lightbox (shared styles) --- */
     dialog{border:none;border-radius:18px;padding:0;max-width:min(860px,94vw);width:100%;box-shadow:0 30px 80px rgba(0,0,0,.35)}
     dialog::backdrop{background:rgba(17,24,39,.55);backdrop-filter:saturate(.9) blur(2px)}
     .modal{display:grid;grid-template-columns:1fr;gap:0}
@@ -126,8 +126,24 @@
     .field h4{margin:0 0 6px;font-size:1rem;color:var(--charcoal)}
     .field p{margin:0;color:var(--ink);line-height:1.5}
 
-    /* --- Sections for About/Contact (simple placeholders) --- */
-    #about, #contact{margin-top:56px;padding-top:16px}
+    /* --- About section --- */
+    #about{margin-top:56px;padding-top:16px}
+    .about-grid{
+      display:grid; gap:18px; align-items:start;
+      grid-template-columns: 120px 1fr;
+    }
+    @media (min-width:768px){
+      .about-grid{ grid-template-columns: 220px 1fr; gap:24px; }
+    }
+    .about-photo{
+      width:100%; aspect-ratio:1/1; object-fit:cover;
+      border-radius:18px; border:1px solid var(--border); box-shadow:var(--shadow);
+      background:#e5e7eb; display:block;
+    }
+    .about-btn{
+      all:unset; display:block; cursor:pointer; border-radius:18px;
+    }
+    .about-btn:focus-visible{outline:2px solid var(--punk); outline-offset:4px; border-radius:18px}
     .lead{font-family:"Crimson Pro", serif;font-size:1.1rem;color:var(--charcoal)}
 
     /* Footer */
@@ -175,7 +191,20 @@
 
     <section id="about" class="section" aria-labelledby="about-title">
       <h2 id="about-title">About</h2>
-      <p class="lead">This starter keeps it minimal so you can focus on the work. Replace this with your short bio and a headshot if you’d like.</p>
+
+      <div class="about-grid">
+        <button class="about-btn" id="about-open" aria-label="Open About details">
+          <img class="about-photo" loading="lazy" decoding="async"
+               src="https://www.dropbox.com/scl/fi/jshcb7c7l9z9os8x2j276/facm101724_00103-1.jpg?rlkey=bxl26w40o707fv3vjg9nsdhqh&raw=1"
+               alt="Photo of Lonny Grafman" referrerpolicy="no-referrer">
+        </button>
+        <div>
+          <p class="lead">
+            Author, Designer, Educator, Facilitator, Presenter, and most importantly teammate with people making epic stuff happen.
+          </p>
+          <p style="margin-top:.5rem;color:#6B7280">Tap the photo to read more.</p>
+        </div>
+      </div>
     </section>
 
     <section id="contact" class="section" aria-labelledby="contact-title">
@@ -185,7 +214,7 @@
     </section>
   </main>
 
-  <!-- Modal / Lightbox -->
+  <!-- Project Modal -->
   <dialog id="project-modal" aria-label="Project details">
     <div class="modal" role="document">
       <header>
@@ -223,6 +252,33 @@
     </div>
   </dialog>
 
+  <!-- About Modal -->
+  <dialog id="about-modal" aria-label="About Lonny">
+    <div class="modal" role="document">
+      <header>
+        <div class="head">
+          <h3 class="title">About Lonny</h3>
+          <button class="close-btn" type="button" aria-label="Close" data-close-about>&times;</button>
+        </div>
+      </header>
+      <div class="body">
+        <p>I love working with awesome people to make great things happen.</p>
+
+        <p>My international experience includes teaching at Universities in Mexico, Spain and Dominican Republic, and India, as well as founding a summer abroad, full immersion programs in resilient community technologies.</p>
+
+        <p>As a teacher, I have a passion to foster creativity, deepen analytic abilities, increase competence, strengthen connections, and generally broaden knowledge in students primarily by working on real projects, with real clients, that ameliorate existing conditions by leveraging local knowledge, wealth and labor through transparency and stakeholder participation. Ultimately, I want the synthesis of the experience to engender a strong, and accurate, sense of competence and integrity in students, so that they can go on to accomplish their own goals.</p>
+
+        <p>In my classroom, I try to foster a sense of openness through humor, fallibility, and modeling positive actions to critical feedback. Together, the students and I continue to improve the curriculum by collaboratively developing and evolving our course. As part of honoring the value that each of us bring, and celebrating that diverse teams are necessary to tackle the problems facing the world, we engage many styles that allow students of various needs, skills, and ways of being to thrive.</p>
+
+        <p>I focus on building resilience in communities, organizations, and individuals by leveraging our own resources to meet our own needs. I do this in the teaching ways noted above and through my roles as the president of Appropedia (sharing these solutions), director of the AWEsome Business Competition (hacking capitalism and giving more opportunities to these projects), author of books like To Catch the Rain and To Catch the Sun (so anyone can start catching their own resources), and advising with people, projects, and organizations. You might like to check out our solarpunk projects like Waterpod and Swale (a floating food barge in New York).</p>
+
+        <p>I love getting to present on any and all of these things!</p>
+
+        <p><strong>Projects:</strong> rainwater; greywater; earthen ovens; adobe buildings; parabolic cookers; composters; photovoltaic systems; upcycling; wastewater treatment; information technology; waste reduction/energy conservation packages; solar hot water; social entrepreneurship; and many more.</p>
+      </div>
+    </div>
+  </dialog>
+
   <!-- Tile template -->
   <template id="tile-template">
     <article class="card" role="listitem">
@@ -239,12 +295,11 @@
 
   <script>
   // ==== CONFIG ====
-  // CSV priority: 1) ?csv=... in URL, 2) config.js, 3) empty (warn)
   const CSV_URL = new URLSearchParams(location.search).get('csv')
     || (window.PORTFOLIO_CONFIG && window.PORTFOLIO_CONFIG.CSV_URL)
     || "";
 
-  // ==== CSV PARSER (handles quotes, commas, newlines) ====
+  // ==== CSV PARSER ====
   function parseCSV(text){
     const rows = [];
     let i = 0, field = '', row = [], inQuotes = false;
@@ -285,7 +340,7 @@
     }).filter(x => x.url);
   }
 
-  // Convert common share URLs → direct image URLs (Drive/Dropbox/GitHub/Appropedia)
+  // Convert share URLs → direct images
   function coerceImageURL(u){
     if(!u) return '';
     try{
@@ -316,12 +371,11 @@
         }
       }
       if(host === 'photos.google.com' || host === 'photos.app.goo.gl'){
-        console.warn('Google Photos share links do not hotlink. Use a direct lh3.googleusercontent.com URL instead:', u);
+        console.warn('Google Photos links do not hotlink. Use an lh3.googleusercontent.com URL.', u);
       }
       return u;
     }catch(e){ return u; }
   }
-
   function extractDriveId(u){
     if(!u) return '';
     try{
@@ -333,8 +387,6 @@
       return '';
     }catch(e){ return ''; }
   }
-
-  // Tolerant field lookup
   function pickField(r, names){
     for(const k of names){ if(r[k] && String(r[k]).trim() !== '') return String(r[k]).trim(); }
     return '';
@@ -393,17 +445,17 @@
     }
   }
 
-  // ==== Modal Logic ====
-  const dialog = document.getElementById('project-modal');
-  const titleOut = document.getElementById('modal-title');
+  // ==== Modals ====
+  const projectDialog = document.getElementById('project-modal');
+  const aboutDialog = document.getElementById('about-modal');
 
-  // field containers + outputs
+  // Project modal outputs
+  const titleOut = document.getElementById('modal-title');
   const fieldReason = document.getElementById('field-reason');
   const fieldDesc   = document.getElementById('field-description');
   const fieldImp    = document.getElementById('field-impacts');
   const fieldRoles  = document.getElementById('field-roles');
   const fieldDates  = document.getElementById('field-dates');
-
   const reasonOut = document.getElementById('modal-reason');
   const descOut   = document.getElementById('modal-description');
   const impOut    = document.getElementById('modal-impacts');
@@ -411,10 +463,15 @@
   const datesOut  = document.getElementById('modal-dates');
   const linksOut  = document.getElementById('modal-links');
 
-  const closeBtn = dialog.querySelector('[data-close]');
-  closeBtn.addEventListener('click', closeModal);
-  dialog.addEventListener('cancel', (e) => { e.preventDefault(); closeModal(); }); // ESC
-  dialog.addEventListener('click', (e) => { if(e.target === dialog) closeModal(); });
+  const closeBtnProject = projectDialog.querySelector('[data-close]');
+  closeBtnProject.addEventListener('click', closeProjectModal);
+  projectDialog.addEventListener('cancel', (e) => { e.preventDefault(); closeProjectModal(); });
+  projectDialog.addEventListener('click', (e) => { if(e.target === projectDialog) closeProjectModal(); });
+
+  const closeBtnAbout = aboutDialog.querySelector('[data-close-about]');
+  closeBtnAbout.addEventListener('click', closeAboutModal);
+  aboutDialog.addEventListener('cancel', (e) => { e.preventDefault(); closeAboutModal(); });
+  aboutDialog.addEventListener('click', (e) => { if(e.target === aboutDialog) closeAboutModal(); });
 
   function setField(container, el, value){
     if(value && String(value).trim() !== ''){
@@ -432,8 +489,6 @@
     setField(fieldDesc,   descOut,   item.description);
     setField(fieldImp,    impOut,    item.impacts);
     setField(fieldRoles,  rolesOut,  item.roles);
-
-    // Dates display remains simple (not requested to title)
     if(item.dates && item.dates.trim() !== ''){
       fieldDates.style.display = '';
       datesOut.textContent = `Dates: ${item.dates}`;
@@ -441,7 +496,6 @@
       fieldDates.style.display = 'none';
       datesOut.textContent = '';
     }
-
     linksOut.innerHTML = '';
     for(const link of parseLinks(item.links)){
       const a = document.createElement('a');
@@ -459,28 +513,51 @@
       PREV_HASH = location.hash;
       location.hash = `#/project/${slug}`;
     }
-    if(!dialog.open){ dialog.showModal(); }
-    trapFocus(dialog);
+    if(!projectDialog.open){ projectDialog.showModal(); }
+    trapFocus(projectDialog);
   }
-
-  function closeModal(){
-    if(dialog.open) dialog.close();
-    if(PREV_HASH && PREV_HASH !== `#/project/${getHashSlug()}`){
-      location.hash = PREV_HASH;
-    } else if(location.hash.startsWith('#/project/')){
+  function closeProjectModal(){
+    if(projectDialog.open) projectDialog.close();
+    if(PREV_HASH && PREV_HASH.startsWith('#/project/')){
       history.pushState('', document.title, window.location.pathname + window.location.search);
     }
   }
 
+  // About modal open/close
+  const aboutOpenBtn = document.getElementById('about-open');
+  if(aboutOpenBtn){
+    aboutOpenBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      PREV_HASH = location.hash;
+      location.hash = '#/about';
+      if(!aboutDialog.open) aboutDialog.showModal();
+      trapFocus(aboutDialog);
+    });
+  }
+  function closeAboutModal(){
+    if(aboutDialog.open) aboutDialog.close();
+    if(location.hash === '#/about'){
+      history.pushState('', document.title, window.location.pathname + window.location.search);
+    }
+  }
+
+  // Hash routing for deep links
   function getHashSlug(){
     const m = location.hash.match(/^#\/project\/([^\s?#]+)/);
     return m ? decodeURIComponent(m[1]) : null;
   }
-
   window.addEventListener('hashchange', () => {
+    if(location.hash === '#/about'){
+      if(!aboutDialog.open) aboutDialog.showModal();
+      trapFocus(aboutDialog);
+      return;
+    }
     const slug = getHashSlug();
     if(slug){ openModalBySlug(slug); }
-    else { if(dialog.open) dialog.close(); }
+    else {
+      if(projectDialog.open) projectDialog.close();
+      if(aboutDialog.open) aboutDialog.close();
+    }
   });
 
   // Focus trap
@@ -502,13 +579,13 @@
   async function boot(){
     try{
       if(location.protocol === 'file:'){
-        console.warn('Tip: serve this over http(s) (e.g., python3 -m http.server) so cross-origin fetch works reliably.');
+        console.warn('Tip: serve over http(s) (e.g., python3 -m http.server) so cross-origin fetch works.');
       }
       if(!CSV_URL){ console.warn('CSV_URL is empty. Set it in config.js or pass ?csv=...'); }
 
       let text;
       try {
-        const res = await fetch(CSV_URL); // direct fetch
+        const res = await fetch(CSV_URL);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         text = await res.text();
       } catch (e) {
@@ -565,6 +642,7 @@
 
     const slug = getHashSlug();
     if(slug) openModalBySlug(slug);
+    if(location.hash === '#/about'){ if(!aboutDialog.open) aboutDialog.showModal(); trapFocus(aboutDialog); }
   }
 
   boot();
