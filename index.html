@@ -213,6 +213,67 @@
     border-radius:var(--radius);
   }
 </style>
+
+<!-- UI polish 02 — card shadow & hover depth (append-only) -->
+<style id="ui-polish-02">
+  /* Shadow tokens */
+  :root{
+    --shadow:        0 2px 8px rgba(0,0,0,.06), 0 1px 0 rgba(0,0,0,.02);
+    --shadow-hover:  0 12px 34px rgba(0,0,0,.18), 0 6px 18px rgba(0,0,0,.08);
+    --border-strong: rgba(17,24,39,0.12);
+  }
+
+  /* Base card refresh */
+  .card{
+    box-shadow: var(--shadow);
+    border-color: var(--border-strong);
+    transform: translateY(0) scale(1);
+    transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+    will-change: transform;
+  }
+
+  /* Subtle image zoom on hover for depth */
+  .thumb img{
+    transition: transform var(--transition);
+    transform: scale(1);
+  }
+
+  /* Elevate on hover (pointer/hover devices only) */
+  @media (hover:hover){
+    .card:hover{
+      transform: translateY(-3px) scale(1.01);
+      box-shadow: var(--shadow-hover);
+      border-color: var(--border-strong);
+    }
+    .card:hover .thumb img{
+      transform: scale(1.02);
+    }
+  }
+
+  /* Elevate when tile is focused via keyboard (accessibility) */
+  .card:focus-within{
+    transform: translateY(-2px) scale(1.005);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--border-strong);
+  }
+
+  /* Active press gives a tiny dip for tactile feel */
+  .card:active{
+    transform: translateY(-1px) scale(1.003);
+  }
+
+  /* Respect reduced motion: keep shadows, ditch transforms */
+  @media (prefers-reduced-motion: reduce){
+    .card,
+    .card:hover,
+    .card:focus-within,
+    .card:active{
+      transform: none !important;
+      transition: box-shadow var(--transition);
+    }
+    .thumb img{ transform: none !important; }
+  }
+</style>
 </head>
 <body>
   <header>
