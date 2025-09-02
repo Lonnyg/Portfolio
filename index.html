@@ -274,6 +274,33 @@
     .thumb img{ transform: none !important; }
   }
 </style>
+
+<!-- UI polish 03 — compact sticky header on scroll -->
+<style id="ui-polish-03">
+  header{
+    transition:
+      background var(--transition),
+      border-color var(--transition),
+      box-shadow var(--transition);
+  }
+  header .wrap{
+    transition: padding var(--transition);
+  }
+
+  /* When scrolled: slightly denser header + subtle shadow */
+  body.is-scrolled header{
+    background: color-mix(in oklab, var(--paper) 88%, white 12%);
+    border-bottom-color: rgba(17,24,39,0.12);
+    box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  }
+  body.is-scrolled header .wrap{
+    padding: 8px 18px; /* was 14px 18px */
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    header, header .wrap{ transition: none !important; }
+  }
+</style>
 </head>
 <body>
   <header>
@@ -676,6 +703,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const y = document.getElementById('year');
   if (y) y.textContent = new Date().getFullYear();
 });
+
+// Compact header on scroll
+(() => {
+  const toggle = () => document.body.classList.toggle('is-scrolled', window.scrollY > 6);
+  toggle();
+  window.addEventListener('scroll', toggle, { passive: true });
+})();
+
   </script>
 
   <!-- GA4 (optional): paste your GA snippet here when deploying) -->
