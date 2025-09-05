@@ -52,6 +52,33 @@
     .btn--primary{background:var(--accent); color:#000; border:0; box-shadow:0 0 0 2px #000 inset;}
     .btn--ghost:hover{border-color:var(--accent);}
 
+    .hero__intro{
+  display:grid;
+  grid-template-columns: 1fr auto;
+  gap:16px;
+  align-items:center;
+  margin-top:10px;
+}
+.hero__portrait{
+  width:96px; height:96px; border-radius:16px; object-fit:cover;
+  border:1px solid var(--line);
+  cursor:pointer;
+  transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.hero__portrait:hover{
+  transform:translateY(-2px);
+  border-color: color-mix(in oklab, var(--accent) 50%, var(--line));
+  box-shadow:0 8px 22px rgba(0,0,0,.25);
+}
+@media (max-width:640px){
+  .hero__intro{
+    grid-template-columns: 1fr auto;
+    gap:12px;
+  }
+  .hero__portrait{ width:80px; height:80px; }
+}
+
+    
     .grid{display:grid; gap:var(--gap); grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); margin-top:1rem;}
     .card{position:relative; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;}
     .card:hover{transform:translateY(-4px); border-color:color-mix(in oklab,var(--accent) 50%,var(--line)); box-shadow:0 10px 30px rgba(0,0,0,.2);}
@@ -124,16 +151,29 @@
       <a href="#contact" class="nav__link">Contact</a>
     </nav>
 
-    <section class="hero" aria-labelledby="intro">
-      <h1 id="intro">Lonny Grafman</h1>
-      <p class="lede">
-        Author, Designer, Educator, Facilitator, Public Speaker, and most importantly teammate with people making epic stuff happen.
-      </p>
-      <div class="hero__ctas">
-        <a href="#projects" class="btn btn--primary">See projects</a>
-        <a class="btn btn--ghost" href="mailto:hello@example.com">Email me</a>
-      </div>
-    </section>
+<section class="hero" aria-labelledby="intro">
+  <h1 id="intro">Lonny Grafman</h1>
+
+  <div class="hero__intro">
+    <p class="lede">
+      Author, Designer, Educator, Facilitator, Public Speaker, and most importantly teammate with people making epic stuff happen.
+    </p>
+
+    <!-- New: small portrait next to the lede; clicking it opens the big bio -->
+    <img
+      class="hero__portrait"
+      src="assets/lonny.jpg"
+      alt="Portrait of Lonny Grafman"
+      loading="lazy"
+      title="Open full bio"
+    />
+  </div>
+
+  <div class="hero__ctas">
+    <a href="#projects" class="btn btn--primary">See projects</a>
+    <a class="btn btn--ghost" href="mailto:hello@example.com">Email me</a>
+  </div>
+</section>
   </header>
 
   <main class="wrap">
@@ -196,12 +236,20 @@
     document.getElementById('year').textContent = new Date().getFullYear();
 
     const aboutPanel = document.querySelector('.about');
-    document.querySelector('[data-open-about]')?.addEventListener('click',()=>aboutPanel.hidden=false);
-    document.querySelector('.about__close')?.addEventListener('click',()=>aboutPanel.hidden=true);
-    aboutPanel?.addEventListener('click', (e) => {
-      const within = e.target.closest('.about__text, .about__img, .about__close');
-      if (!within) aboutPanel.hidden = true;
-    });
+
+// Open About from nav link AND from the hero portrait
+document.querySelectorAll('[data-open-about], .hero__portrait').forEach(el=>{
+  el?.addEventListener('click', ()=> aboutPanel.hidden = false);
+});
+
+// Close button
+document.querySelector('.about__close')?.addEventListener('click',()=> aboutPanel.hidden = true);
+
+// Optional: click outside to close
+aboutPanel?.addEventListener('click', (e) => {
+  const within = e.target.closest('.about__text, .about__img, .about__close');
+  if (!within) aboutPanel.hidden = true;
+});
 
     // Scroll progress
     const progress = document.querySelector('.scroll-progress');
