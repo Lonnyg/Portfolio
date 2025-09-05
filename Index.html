@@ -1,0 +1,222 @@
+<!--
+Portfolio Revamp — Single-file preview build
+Clean, elegant, solarpunk-academic vibe with a subtle punk undertone
+One surprising technical flourish: scroll-linked (JS-backed) progress bar
+
+This single HTML file inlines CSS & JS for easy preview on GitHub Pages.
+For production, split into /assets/styles.css and /assets/script.js as desired.
+--><!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lonny Grafman — Portfolio</title>
+  <meta name="description" content="Educator, designer, and facilitator building resilient, community-led futures. Projects, teaching, and open work.">
+  <meta property="og:title" content="Lonny Grafman — Portfolio">
+  <meta property="og:description" content="Educator, designer, and facilitator building resilient, community-led futures.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/og-card.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0c0c; --text:#e7e7e7; --muted:#a0a0a0;
+      --card:#141515; --line:#1f2020;
+      --accent:#39ff14; /* neon moss */
+      --radius:18px; --pad:18px; --gap:18px; --max:1080px;
+      color-scheme: dark light;
+    }
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#ffffff; --text:#111; --muted:#565656; --card:#f8f8f8; --line:#eaeaea; }
+    }html,body{margin:0; padding:0; background:var(--bg); color:var(--text);
+  font:16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;}
+h1,h2,h3{font-family:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing:.2px;}
+h1{font-size:clamp(2rem,3vw,3rem); line-height:1.1;}
+.lede{max-width:60ch; color:var(--muted);}    
+
+.wrap{max-width:var(--max); margin-inline:auto; padding: clamp(16px, 3vw, 32px);}   
+.site-header{position:relative}
+.nav{display:flex; gap:20px; justify-content:flex-end}
+.nav__link{position:relative; text-decoration:none; color:var(--text);}    
+.nav__link::after{content:""; position:absolute; left:0; bottom:-3px; width:0; height:2px; background:var(--accent); transition:width .25s ease;}
+.nav__link:hover::after{width:100%;}
+
+.hero{padding-top:28px;}
+.hero__ctas{display:flex; gap:12px; margin-top:16px}
+.btn{border-radius:999px; padding:.7rem 1rem; border:1px solid var(--line); background:transparent; color:var(--text); cursor:pointer; text-decoration:none; display:inline-block}
+.btn--primary{background:var(--accent); color:#000; border:0; box-shadow: 0 0 0 2px #000 inset;}
+.btn--ghost:hover{border-color:var(--accent);}    
+
+.grid{display:grid; gap:var(--gap); grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top:1rem;}
+.card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;}
+.card:hover{transform: translateY(-4px); border-color: color-mix(in oklab, var(--accent) 50%, var(--line)); box-shadow:0 10px 30px rgba(0,0,0,.2);}    
+.card img{display:block; width:100%; height:180px; object-fit:cover;}
+.card__body{padding:var(--pad);}    
+.card__blurb{color:var(--muted); margin:.3rem 0 .6rem;}
+.tags{display:flex; flex-wrap:wrap; gap:8px; padding:0; margin:0 0 .6rem; list-style:none;}
+.tags li{font:12px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace; padding:.35rem .5rem; border:1px dashed var(--line); border-radius:999px;}
+.card__link{color:var(--text); text-decoration:none; border-bottom:1px solid var(--line);}    
+.card__link:hover{border-color:var(--accent); color:var(--accent);}    
+
+.scroll-progress{position:sticky; bottom:12px; height:3px; margin-top:40px; background: linear-gradient(90deg, var(--accent) var(--_pct,0%), transparent 0); border-radius:999px; opacity:.7;}
+
+.about{position:fixed; inset:clamp(20px,3vw,40px); background:var(--card); border:1px solid var(--line); border-radius:24px; display:grid; grid-template-columns: 260px 1fr; gap:24px; padding:24px; box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.about[hidden]{display:none;}
+.about__img{width:100%; height:100%; object-fit:cover; border-radius:16px;}
+.about__close{position:absolute; top:12px; right:12px; font-size:24px; background:transparent; border:0; color:var(--text); cursor:pointer;}
+
+.contact .form{max-width:680px}
+.form label{display:block; margin:10px 0; font-family:"IBM Plex Mono", ui-monospace, monospace; font-size:.9rem}
+.form input,.form textarea{width:100%; padding:.8rem 1rem; border-radius:12px; border:1px solid var(--line); background:var(--card); color:var(--text)}
+.form input:focus,.form textarea:focus{outline:2px solid color-mix(in oklab, var(--accent) 50%, transparent)}
+
+.site-footer{display:flex; justify-content:space-between; align-items:center; gap:16px; font-size:.95rem; border-top:1px solid var(--line); margin-top:32px; padding-top:16px}
+.social a{margin-right:10px; text-decoration:none; color:var(--muted);} 
+.social a:hover{color:var(--accent)}
+
+/* Subtle SVG noise overlay */
+body::after{content:""; pointer-events:none; position:fixed; inset:0; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.025"/></svg>'); mix-blend-mode:overlay; opacity:.6;}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} }
+
+/* Punk mode (Konami) */
+html.punk{ --accent:#ff2dfb; filter: contrast(1.03) saturate(1.08); }
+html.punk body{ animation: crt 0.12s steps(2,end) infinite; }
+@keyframes crt { 50% { transform: translateY(.3px) } }
+
+  </style>
+</head>
+<body>
+  <header class="site-header wrap">
+    <nav class="nav" aria-label="Primary">
+      <a href="#projects" class="nav__link">Projects</a>
+      <a href="#about" class="nav__link" data-open-about>About</a>
+      <a href="#contact" class="nav__link">Contact</a>
+    </nav><section class="hero" aria-labelledby="intro">
+  <h1 id="intro">Lonny Grafman</h1>
+  <p class="lede">Educator, designer, and facilitator—building resilient, solarpunk futures with real teams and real impact.</p>
+  <div class="hero__ctas">
+    <a href="#projects" class="btn btn--primary">See projects</a>
+    <a class="btn btn--ghost" href="mailto:hello@example.com">Email me</a>
+  </div>
+</section>
+
+  </header>  <main class="wrap">
+    <section id="projects" class="projects" aria-labelledby="proj">
+      <h2 id="proj">Projects</h2>
+      <div class="grid">
+        <!-- SAMPLE CARD 1 -->
+        <article class="card">
+          <img src="assets/waterpod.jpg" alt="Waterpod floating food forest on the water" loading="lazy">
+          <div class="card__body">
+            <h3>Waterpod</h3>
+            <p class="card__blurb">Floating food forest—public art, ecology, and education.</p>
+            <ul class="tags"><li>solarpunk</li><li>education</li><li>public</li></ul>
+            <a class="card__link" href="https://www.waterpod.org/" target="_blank" rel="noopener">Learn more →</a>
+          </div>
+        </article>
+        <!-- SAMPLE CARD 2 -->
+        <article class="card">
+          <img src="assets/swale.jpg" alt="Swale project: floating barge with greenery and people visiting" loading="lazy">
+          <div class="card__body">
+            <h3>Swale</h3>
+            <p class="card__blurb">A floating food forest in NYC—art, access, and urban ecology.</p>
+            <ul class="tags"><li>public</li><li>ecology</li><li>education</li></ul>
+            <a class="card__link" href="https://www.swaleny.org/" target="_blank" rel="noopener">Learn more →</a>
+          </div>
+        </article>
+        <!-- SAMPLE CARD 3 -->
+        <article class="card">
+          <img src="assets/tcts.jpg" alt="To Catch the Sun book cover mockup with solar panels" loading="lazy">
+          <div class="card__body">
+            <h3>To Catch the Sun</h3>
+            <p class="card__blurb">Open-source book and curriculum on solar design with communities.</p>
+            <ul class="tags"><li>open-source</li><li>education</li><li>energy</li></ul>
+            <a class="card__link" href="https://www.appropedia.org/To_Catch_the_Sun" target="_blank" rel="noopener">Learn more →</a>
+          </div>
+        </article>
+        <!-- SAMPLE CARD 4 -->
+        <article class="card">
+          <img src="assets/appropedia.jpg" alt="Appropedia wiki screenshot snippet" loading="lazy">
+          <div class="card__body">
+            <h3>Appropedia</h3>
+            <p class="card__blurb">Global wiki for sustainability, appropriate tech, and resilience.</p>
+            <ul class="tags"><li>wiki</li><li>open-source</li><li>community</li></ul>
+            <a class="card__link" href="https://www.appropedia.org/" target="_blank" rel="noopener">Learn more →</a>
+          </div>
+        </article>
+      </div>
+      <div class="scroll-progress" aria-hidden="true"></div>
+    </section><section id="about" class="about" hidden>
+  <button class="about__close" aria-label="Close about" title="Close">×</button>
+  <img class="about__img" src="assets/lonny.jpg" alt="Portrait of Lonny Grafman">
+  <div class="about__text">
+    <h2>About Lonny</h2>
+    <p>Author, designer, educator, and teammate working on resilient, community-led technologies with students and partners around the world. I build courses and programs that turn analysis into action—and celebrate learning through real projects with real stakeholders.</p>
+    <details>
+      <summary>Read more</summary>
+      <p>International teaching across Mexico, Spain, the Dominican Republic, and India; founder of immersion programs in resilient community tech. In my classrooms and teams, I aim for creativity, competence, and connection—grounded in transparency and participation.</p>
+    </details>
+  </div>
+</section>
+
+<section id="contact" class="contact" aria-labelledby="ct">
+  <h2 id="ct">Contact</h2>
+  <!-- Simple static option: mailto button. Replace email below. -->
+  <p><a class="btn btn--primary" href="mailto:hello@example.com">Email me</a></p>
+  <!-- Netlify-friendly form (optional). If deploying on Netlify, uncomment. -->
+  <!--
+  <form name="contact" method="POST" data-netlify="true" class="form">
+    <input type="hidden" name="form-name" value="contact">
+    <label>Reason <input required name="reason" placeholder="Speaking / Collaboration / Teaching"></label>
+    <label>Email <input required type="email" name="email" placeholder="you@example.com"></label>
+    <label>Message <textarea required name="message" rows="5" placeholder="Tell me about your project…"></textarea></label>
+    <button class="btn btn--primary" type="submit">Send</button>
+  </form>
+  -->
+</section>
+
+  </main>  <footer class="site-footer wrap">
+    <p>© <span id="year"></span> Lonny Grafman · <a href="https://appropedia.org/" target="_blank" rel="noopener">Appropedia</a></p>
+    <div class="social">
+      <a href="https://instagram.com/" aria-label="Instagram">IG</a>
+      <a href="https://www.linkedin.com/in/" aria-label="LinkedIn">LI</a>
+      <a href="https://youtube.com/" aria-label="YouTube">YT</a>
+    </div>
+  </footer>  <script>
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // About panel open/close
+    const aboutPanel = document.querySelector('.about');
+    document.querySelector('[data-open-about]')?.addEventListener('click',()=>aboutPanel.hidden=false);
+    document.querySelector('.about__close')?.addEventListener('click',()=>aboutPanel.hidden=true);
+
+    // Scroll-linked progress (JS fallback — also works cross-browser)
+    const progress = document.querySelector('.scroll-progress');
+    const projects = document.getElementById('projects');
+    function updateProgress(){
+      const rect = projects.getBoundingClientRect();
+      const total = rect.height - window.innerHeight;
+      const seen = Math.min(Math.max(0, 0 - rect.top), total);
+      const pct = total > 0 ? (seen/total)*100 : 0;
+      progress.style.setProperty('--_pct', pct + '%');
+    }
+    updateProgress();
+    addEventListener('scroll', updateProgress, {passive:true});
+    addEventListener('resize', updateProgress);
+
+    // Konami -> Punk mode (glitch for 10s)
+    (() => {
+      const seq = [38,38,40,40,37,39,37,39,66,65]; let i=0;
+      window.addEventListener('keydown', e=>{
+        i = (e.keyCode===seq[i]) ? i+1 : 0;
+        if(i===seq.length){ i=0; document.documentElement.classList.add('punk'); setTimeout(()=>document.documentElement.classList.remove('punk'),10000); }
+      });
+    })();
+  </script></body>
+</html>
