@@ -1,156 +1,601 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Lonny Grafman — Portfolio</title>
-  <meta name="description" content="Educator, designer, and facilitator building resilient, community-led futures. Projects, teaching, and open work.">
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lonny Grafman — Projects</title>
+  <meta name="description" content="Lonny Grafman’s portfolio of engineering design, resilient community projects, entrepreneurship, and education." />
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
+    /* --- CSS Variables --- */
     :root{
-      --bg:#0b0c0c; --text:#e7e7e7; --muted:#a0a0a0;
-      --card:#141515; --line:#1f2020;
-      --accent:#39ff14;
-      --radius:18px; --pad:18px; --gap:18px; --max:1080px;
-      color-scheme: dark light;
+      --paper:#F7F7F5; /* background */
+      --charcoal:#111827; /* headings/text */
+      --ink:#374151; /* body text */
+      --accent:#0EA5A4; /* links, hovers */
+      --punk:#A3E635; /* tiny accents/focus ring */
+      --card:#FFFFFF;
+      --border:rgba(17,24,39,0.08);
+      --shadow:0 2px 8px rgba(0,0,0,.06), 0 1px 0 rgba(0,0,0,.02);
+      --shadow-hover:0 12px 34px rgba(0,0,0,.18), 0 6px 18px rgba(0,0,0,.08);
+      --radius:18px;
+      --gap:clamp(12px, 2.2vw, 20px);
+      --transition:150ms cubic-bezier(.2,.6,.2,1);
     }
-    @media (prefers-color-scheme: light){
-      :root{ --bg:#ffffff; --text:#111; --muted:#565656; --card:#f8f8f8; --line:#eaeaea; }
+
+    /* --- Base / Typography --- */
+    html,body{height:100%;}
+    body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.5 Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;}
+    h1,h2,h3{color:var(--charcoal);line-height:1.2;margin:0 0 .6rem;}
+    h1{font-size:clamp(1.6rem,2.4vw,2.3rem);font-weight:800}
+    h2{font-size:clamp(1.2rem,1.7vw,1.5rem);font-weight:700}
+    h3{font-size:clamp(1rem,1.2vw,1.05rem);font-weight:700}
+    p{margin:.5rem 0 0}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* --- Layout --- */
+    header{position:sticky;top:0;z-index:20;background:color-mix(in oklab, var(--paper) 92%, white 8%);backdrop-filter:saturate(1.1) blur(6px);border-bottom:1px solid var(--border);
+      transition:background var(--transition), border-color var(--transition), box-shadow var(--transition)}
+    .wrap{max-width:1200px;margin:0 auto;padding:14px 18px}
+    nav{display:flex;gap:18px;align-items:center}
+    nav a{font-weight:600;color:var(--charcoal);padding:8px 10px;border-radius:10px}
+    nav a:focus-visible{outline:2px solid var(--punk);outline-offset:2px}
+
+    main{padding:24px 18px 80px}
+    .section{max-width:1200px;margin:0 auto}
+
+    /* compact header on scroll */
+    body.is-scrolled header{background:color-mix(in oklab, var(--paper) 88%, white 12%);border-bottom-color:rgba(17,24,39,0.12);box-shadow:0 6px 18px rgba(0,0,0,.08)}
+    body.is-scrolled header .wrap{padding:8px 18px}
+    @media (prefers-reduced-motion:reduce){header,.wrap{transition:none !important}}
+
+    /* --- Grid (Option A) --- */
+    .grid{display:grid;gap:var(--gap)}
+    @media (min-width:1440px){.grid{grid-template-columns:repeat(5,1fr)}}
+    @media (min-width:1024px) and (max-width:1439px){.grid{grid-template-columns:repeat(4,1fr)}}
+    @media (min-width:768px) and (max-width:1023px){.grid{grid-template-columns:repeat(3,1fr)}}
+    @media (min-width:520px) and (max-width:767px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:519px){.grid{grid-template-columns:1fr}}
+
+    /* --- Card / Tile --- */
+    .card{display:block;background:var(--card);border:1px solid rgba(17,24,39,0.12);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;transition:transform var(--transition), box-shadow var(--transition), border-color var(--transition);will-change:transform}
+    .card:hover{transform:translateY(-3px) scale(1.01);box-shadow:var(--shadow-hover)}
+    .card:focus-within{transform:translateY(-2px) scale(1.005);box-shadow:var(--shadow-hover)}
+    .card:active{transform:translateY(-1px) scale(1.003)}
+    .thumb{position:relative;aspect-ratio:16/9;background:#e5e7eb;overflow:hidden}
+    .thumb img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.02);transition:transform var(--transition);transform:scale(1)}
+    .card:hover .thumb img{transform:scale(1.02)}
+    .img-skeleton{position:absolute;inset:0;background:linear-gradient(100deg,#f2f3f2 10%,#e6e7e6 30%,#f2f3f2 50%);background-size:200% 100%;animation:shimmer 1.2s infinite;}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+    /* Overlay (on-hover, on-focus, always-on for touch) */
+    .overlay{
+      position:absolute; inset:auto 0 0 0;
+      display:flex; align-items:flex-end;
+      padding:10px 12px; color:#fff;
+      background: linear-gradient(
+        to top,
+        rgba(0,0,0,.72),
+        rgba(0,0,0,.45) 40%,
+        rgba(0,0,0,0) 68%
+      );
+      opacity:0; transition:opacity var(--transition)
+    }
+    .overlay h3{margin:0;font-weight:700;letter-spacing:.2px;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+    .card:focus-within .overlay,.card:hover .overlay{opacity:1}
+    @media (hover:none){.overlay{opacity:1}}
+    @media (prefers-contrast: more){
+      .overlay{
+        background: linear-gradient(
+          to top,
+          rgba(0,0,0,.85),
+          rgba(0,0,0,.55) 40%,
+          rgba(0,0,0,0) 70%
+        );
+      }
     }
 
-    html,body{margin:0; padding:0; background:var(--bg); color:var(--text);
-      font:16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;}
-    h1,h2,h3{font-family:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;}
-    h1{font-size:clamp(2rem,3vw,3rem);}
-    .lede{max-width:60ch; color:var(--muted);}
-    .wrap{max-width:var(--max); margin-inline:auto; padding: clamp(16px, 3vw, 32px);}   
-    .nav{display:flex; gap:20px; justify-content:flex-end}
-    .nav__link{position:relative; text-decoration:none; color:var(--text);}    
-    .nav__link::after{content:""; position:absolute; left:0; bottom:-3px; width:0; height:2px; background:var(--accent); transition:width .25s ease;}
-    .nav__link:hover::after{width:100%;}
-    .btn{border-radius:999px; padding:.7rem 1rem; border:1px solid var(--line); background:transparent; color:var(--text); cursor:pointer; text-decoration:none; display:inline-block}
-    .btn--primary{background:var(--accent); color:#000; border:0;}
+    .meta{padding:12px 12px 16px}
+    .reason{color:var(--ink);font-size:.95rem;line-height:1.45}
 
-    .grid{display:grid; gap:var(--gap); grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));}
-    .card{position:relative; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;}
-    .card img{display:block; width:100%; height:220px; object-fit:cover; filter:saturate(1.02);} 
-    .card__overlay{position:absolute; inset:0; background:linear-gradient(to top, rgba(0,0,0,.7), transparent 50%); display:flex; align-items:flex-end;}
-    .card__overlay h3{margin:0; padding:12px; font-size:1.1rem; color:var(--accent);}
+    /* --- Modal / Lightbox --- */
+    dialog{border:none;border-radius:18px;padding:0;max-width:min(860px,94vw);width:100%;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+    dialog::backdrop{background:rgba(17,24,39,.55);backdrop-filter:saturate(.9) blur(2px)}
+    .modal{display:grid;grid-template-columns:1fr;gap:0}
+    .modal header{position:sticky;top:0;background:var(--card);border-bottom:1px solid var(--border);border-radius:18px 18px 0 0}
+    .modal .head{display:flex;justify-content:space-between;align-items:center;padding:14px 18px}
+    .modal .title{margin:0;font-size:1.4rem}
+    .close-btn{
+      appearance:none;border:none;background:transparent;font-size:1.5rem;line-height:1;
+      padding:10px 12px;min-width:44px;min-height:44px;border-radius:10px;cursor:pointer;color:var(--charcoal)
+    }
+    .close-btn:focus-visible{outline:2px solid var(--punk);outline-offset:3px}
+    .modal .body{padding:20px 22px 22px}
+    .muted{color:#6B7280;font-size:.95rem}
+    .meta-row{margin-top:12px;color:#4B5563;font-size:.95rem;line-height:1.4}
+    .links{margin-top:14px;display:flex;flex-wrap:wrap;gap:12px}
+    .links a{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;transition:background var(--transition);font-weight:600}
+    .links a:hover{background:#fafafa}
 
-    .scroll-progress{position:sticky; bottom:12px; height:3px; margin-top:40px; background: linear-gradient(90deg, var(--accent) var(--_pct,0%), transparent 0); border-radius:999px; opacity:.7;}
+    /* Modal field groups (titles before text) */
+    .field{margin-top:14px}
+    .field h4{margin:0 0 6px;font-size:1rem;color:var(--charcoal)}
+    .field p{margin:0;color:var(--ink);line-height:1.5}
 
-    body::after{content:""; pointer-events:none; position:fixed; inset:0; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="140" height="140"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.025"/></svg>'); mix-blend-mode:overlay; opacity:.6;}
-    html.punk{ --accent:#ff2dfb; filter: contrast(1.03) saturate(1.08); }
-    html.punk body{ animation: crt 0.12s steps(2,end) infinite; }
-    @keyframes crt { 50% { transform: translateY(.3px) } }
-  .card__overlay{position:absolute; left:0; right:0; bottom:0; padding:12px 14px; color:#fff; font-family:\"IBM Plex Mono\", ui-monospace, monospace; font-weight:600; letter-spacing:.2px; text-shadow:0 1px 2px rgba(0,0,0,.6); background:linear-gradient( to top, rgba(0,0,0,.6), rgba(0,0,0,0) 70% ); border-top:1px solid rgba(255,255,255,.08);} .card:hover .card__overlay{background:linear-gradient( to top, rgba(0,0,0,.72), rgba(0,0,0,0) 70% );}
-</style>
+    /* --- Sections for About/Contact (simple placeholders) --- */
+    #about, #contact{margin-top:56px;padding-top:16px}
+    .lead{font-family:"Crimson Pro", serif;font-size:1.1rem;color:var(--charcoal)}
+
+    /* Footer */
+    footer{border-top:1px solid var(--border);margin-top:48px}
+    footer .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:18px}
+    .footer-links{display:flex;gap:14px;flex-wrap:wrap}
+    .footer-links a{color:var(--ink);font-weight:600}
+    .footer-links a:focus-visible{outline:2px solid var(--punk);outline-offset:2px}
+    .footer-copy{color:#6B7280;font-size:.9rem}
+
+    /* Focus styles */
+    :focus-visible{outline:2px solid var(--punk);outline-offset:2px}
+    .tile-btn:focus-visible{outline:2px solid var(--punk);outline-offset:4px;border-radius:var(--radius)}
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion:reduce){
+      *{animation:none!important;transition:none!important}
+      .card,.card:hover,.card:focus-within,.card:active{transform:none!important}
+      .thumb img{transform:none!important}
+    }
+
+    /* Utility */
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  </style>
+
+  <!-- Load runtime config (CSV_URL lives here by default) -->
+  <script src="config.js"></script>
 </head>
 <body>
-  <header class="wrap">
-    <nav class="nav">
-      <a href="#projects" class="nav__link">Projects</a>
-      <a href="#contact" class="nav__link">Contact</a>
-    </nav>
-    <h1>Lonny Grafman</h1>
-    <p class="lede">Educator, designer, facilitator—building resilient, solarpunk futures with real teams and real impact.</p>
-    <div><a href="#projects" class="btn btn--primary">See projects</a></div>
+  <header>
+    <div class="wrap">
+      <nav aria-label="Primary">
+        <a href="#projects">Projects</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
   </header>
 
-  <main class="wrap">
-    <section id="projects">
-      <h2>Projects</h2>
-      <div id="projects-grid" class="grid"></div>
-      <div class="scroll-progress" aria-hidden="true"></div>
+  <main>
+    <section id="projects" class="section" aria-labelledby="projects-title">
+      <h1 id="projects-title">Projects</h1>
+      <div id="grid" class="grid" role="list" aria-label="Project tiles"></div>
     </section>
 
-    <section id="contact">
-      <h2>Contact</h2>
-      <p><a class="btn btn--primary" href="mailto:hello@example.com">Email me</a></p>
+    <section id="about" class="section" aria-labelledby="about-title">
+      <h2 id="about-title">About</h2>
+      <p class="lead">This starter keeps it minimal so you can focus on the work. Replace this with your short bio and a headshot if you’d like.</p>
+    </section>
+
+    <section id="contact" class="section" aria-labelledby="contact-title">
+      <h2 id="contact-title">Contact</h2>
+      <p>Email: <a href="mailto:you@example.com">you@example.com</a></p>
+      <p><!-- Insert your Mailchimp embed here (with honeypot/reCAPTCHA as needed) --></p>
     </section>
   </main>
 
-  <footer class="wrap">
-    <p>© <span id="year"></span> Lonny Grafman</p>
-  </footer>
+  <!-- Modal / Lightbox -->
+  <dialog id="project-modal" aria-label="Project details">
+    <div class="modal" role="document">
+      <header>
+        <div class="head">
+          <h3 class="title" id="modal-title">Title</h3>
+          <button class="close-btn" type="button" aria-label="Close" data-close>&times;</button>
+        </div>
+      </header>
+      <div class="body">
+        <!-- Titles before text -->
+        <div class="field" id="field-reason">
+          <h4>Reason</h4>
+          <p class="muted" id="modal-reason"></p>
+        </div>
 
-  <dialog id="modal" class="modal">
-    <div class="modal__dialog">
-      <img id="mImg" class="modal__img" alt="">
-      <div class="modal__body">
-        <button id="mClose" class="about__close" aria-label="Close">×</button>
-        <h3 id="mTitle" class="modal__title"></h3>
-        <div id="mMeta" class="meta"></div>
-        <p id="mReason" class="meta" style="margin-top:.25rem"></p>
-        <div id="mDesc" style="margin-top:10px"></div>
-        <div id="mImpacts" style="margin-top:10px"></div>
-        <div id="mRoles" style="margin-top:10px"></div>
-        <div id="mTags" style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap"></div>
-        <div id="mLinks" class="btnrow"></div>
+        <div class="field" id="field-description">
+          <h4>Description</h4>
+          <p id="modal-description"></p>
+        </div>
+
+        <div class="field" id="field-impacts">
+          <h4>Impacts</h4>
+          <p id="modal-impacts"></p>
+        </div>
+
+        <div class="field" id="field-roles">
+          <h4>Roles</h4>
+          <p id="modal-roles"></p>
+        </div>
+
+        <p class="meta-row" id="field-dates"><span id="modal-dates"></span></p>
+
+        <div class="links" id="modal-links"></div>
       </div>
     </div>
   </dialog>
 
+  <!-- Tile template -->
+  <template id="tile-template">
+    <article class="card" role="listitem">
+      <button class="tile-btn" style="all:unset;display:block;cursor:pointer" aria-label="Open project">
+        <div class="thumb">
+          <div class="img-skeleton" aria-hidden="true"></div>
+          <img alt="" loading="lazy" decoding="async">
+          <div class="overlay"><h3></h3></div>
+        </div>
+        <div class="meta"><p class="reason"></p></div>
+      </button>
+    </article>
+  </template>
+
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
-    const progress = document.querySelector('.scroll-progress');
-    const projects = document.getElementById('projects');
-    function updateProgress(){
-      const rect = projects.getBoundingClientRect();
-      const total = rect.height - window.innerHeight;
-      const seen = Math.min(Math.max(0, 0 - rect.top), total);
-      const pct = total > 0 ? (seen/total)*100 : 0;
-      progress.style.setProperty('--_pct', pct + '%');
+  // ==== CONFIG ====
+  // CSV priority: 1) ?csv=... in URL, 2) config.js, 3) empty (warn)
+  const CSV_URL = new URLSearchParams(location.search).get('csv')
+    || (window.PORTFOLIO_CONFIG && window.PORTFOLIO_CONFIG.CSV_URL)
+    || "";
+
+  // ==== CSV PARSER (handles quotes, commas, newlines) ====
+  function parseCSV(text){
+    const rows = [];
+    let i = 0, field = '', row = [], inQuotes = false;
+    while(i < text.length){
+      const c = text[i];
+      if(inQuotes){
+        if(c === '"'){
+          if(text[i+1] === '"'){ field += '"'; i++; }
+          else { inQuotes = false; }
+        } else { field += c; }
+      } else {
+        if(c === '"'){ inQuotes = true; }
+        else if(c === ','){ row.push(field); field = ''; }
+        else if(c === '\n'){
+          row.push(field); rows.push(row); row = []; field = '';
+        } else if(c !== '\r'){ field += c; }
+      }
+      i++;
     }
-    addEventListener('scroll', updateProgress, {passive:true});
-    addEventListener('resize', updateProgress);
-    updateProgress();
+    if(field.length || row.length){ row.push(field); rows.push(row); }
+    const headers = rows.shift().map(h => h.trim());
+    return rows.filter(r => r.length && r.some(x => x && x.trim() !== ''))
+      .map(r => Object.fromEntries(headers.map((h, idx) => [h, (r[idx] ?? '').trim()])));
+  }
 
-    (() => {
-      const seq = [38,38,40,40,37,39,37,39,66,65]; let i=0;
-      window.addEventListener('keydown', e=>{
-        i = (e.keyCode===seq[i]) ? i+1 : 0;
-        if(i===seq.length){ i=0; document.documentElement.classList.add('punk'); setTimeout(()=>document.documentElement.classList.remove('punk'),10000);} });
-    })();
+  // ==== Helpers ====
+  const normalizeBool = v => (String(v).toLowerCase().trim() === 'true' || v === '1' || String(v).toLowerCase() === 'yes');
+  const toNumber = v => { const n = Number(v); return Number.isFinite(n) ? n : 9999; };
+  function deriveAlt({ title, reason }){
+    const s = `${title || ''}${reason ? ' — ' + reason : ''}`.trim();
+    return s.length > 160 ? s.slice(0,157) + '…' : s || 'Project image';
+  }
+  function parseLinks(cell){
+    if(!cell) return [];
+    return cell.split(';').map(s => s.trim()).filter(Boolean).map(pair => {
+      const [label, url] = pair.includes('|') ? pair.split('|') : [pair, pair];
+      return { label: (label||'Link').trim(), url: (url||'').trim() };
+    }).filter(x => x.url);
+  }
 
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRwYDBqR1Ig7T0gzs172Esm_cpJ28o8JwClwiiLtXQ65Fjd4_aVY13nKR3p_F6Qtpjq76p9yDYpsmFl/pub?output=csv";
-    fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(CSV_URL)}`)
-      .then(r=>r.json()).then(data=>{
-        const rows = data.contents.split(/\r?\n/).map(r=>r.split(","));
-        const headers = rows.shift().map(h=>h.trim().toLowerCase());
-        const grid = document.getElementById('projects-grid');
-        rows.forEach(cells=>{
-          const row = {};
-          headers.forEach((h,i)=> row[h]=cells[i]);
-          if(!row.published || !/true|1|yes/i.test(row.published)) return;
-          const card = document.createElement('article');
-          card.className="card";
-          const img = document.createElement('img');
-          img.src = row.image; img.alt = row.title||\"Project image\";
-          card.appendChild(img);
-          const overlay = document.createElement('div');
-          overlay.className = 'card__overlay';
-          overlay.textContent = row.title || 'Untitled';
-          card.appendChild(overlay);
-          grid.appendChild(card);
-        });
+  // Convert common share URLs → direct image URLs (Drive/Dropbox/GitHub/Appropedia)
+  function coerceImageURL(u){
+    if(!u) return '';
+    try{
+      if(/^\/?\/?[^\s]+\.[^\s]+/.test(u) && !/^https?:/i.test(u)){
+        u = (u.startsWith('//') ? 'https:' : 'https://') + u.replace(/^\/+/, '');
+      }
+      const url = new URL(u);
+      const host = url.hostname;
+      const path = url.pathname;
+
+      if(host === 'drive.google.com'){
+        const m = path.match(/\/file\/d\/([^/]+)/);
+        const id = m ? m[1] : (url.searchParams.get('id') || '');
+        if(id) return `https://drive.google.com/uc?export=view&id=${id}`;
+      }
+      if(host.endsWith('dropbox.com')){
+        url.searchParams.delete('dl'); url.searchParams.set('raw','1');
+        return url.toString();
+      }
+      if(host.endsWith('github.com') && path.includes('/blob/')){
+        return url.toString().replace('/blob/','/raw/');
+      }
+      if(host.endsWith('appropedia.org')){
+        const mFile = path.match(/^\/(wiki\/)?File:(.+)$/);
+        if(mFile){
+          const fname = mFile[2];
+          return `https://www.appropedia.org/Special:FilePath/${encodeURIComponent(fname)}`;
+        }
+      }
+      if(host === 'photos.google.com' || host === 'photos.app.goo.gl'){
+        console.warn('Google Photos share links do not hotlink. Use a direct lh3.googleusercontent.com URL instead:', u);
+      }
+      return u;
+    }catch(e){ return u; }
+  }
+
+  function extractDriveId(u){
+    if(!u) return '';
+    try{
+      const url = new URL(u);
+      if(url.hostname === 'drive.google.com'){
+        const m = url.pathname.match(/\/file\/d\/([^/]+)/);
+        return m ? m[1] : (url.searchParams.get('id') || '');
+      }
+      return '';
+    }catch(e){ return ''; }
+  }
+
+  // Tolerant field lookup
+  function pickField(r, names){
+    for(const k of names){ if(r[k] && String(r[k]).trim() !== '') return String(r[k]).trim(); }
+    return '';
+  }
+
+  // ==== State ====
+  let PROJECTS = [];
+  let PREV_HASH = location.hash;
+
+  // ==== Rendering ====
+  const grid = document.getElementById('grid');
+  const tpl = document.getElementById('tile-template');
+
+  function renderGrid(items){
+    grid.innerHTML = '';
+    for(const item of items){
+      const node = tpl.content.firstElementChild.cloneNode(true);
+      const btn = node.querySelector('.tile-btn');
+      const img = node.querySelector('img');
+      const skel = node.querySelector('.img-skeleton');
+      const titleEl = node.querySelector('.overlay h3');
+      const reasonEl = node.querySelector('.reason');
+
+      node.dataset.slug = item.slug;
+      titleEl.textContent = item.title || 'Untitled';
+      reasonEl.textContent = item.reason || '';
+
+      img.alt = deriveAlt(item);
+      img.referrerPolicy = 'no-referrer';
+      const resolvedSrc = coerceImageURL(item.image || '');
+      img.src = resolvedSrc;
+
+      img.addEventListener('load', () => skel.remove());
+      img.addEventListener('error', () => {
+        const driveId = extractDriveId(item.image || resolvedSrc);
+        if(driveId && !img.dataset.driveTried){
+          img.dataset.driveTried = '1';
+          img.src = `https://drive.google.com/thumbnail?id=${driveId}&sz=w1600`;
+          return;
+        }
+        console.warn('Image failed to load. Original:', item.image, 'Resolved:', resolvedSrc);
+        skel.remove();
+        const thumb = img.closest('.thumb');
+        img.remove();
+        const fallback = document.createElement('div');
+        fallback.setAttribute('aria-hidden','true');
+        fallback.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#e5e7eb;color:#6b7280;font-weight:600;font-size:0.95rem;';
+        fallback.textContent = 'Image unavailable';
+        thumb.appendChild(fallback);
       });
 
-    function openModal(item){
-      const modal=document.getElementById('modal');
-      document.getElementById('mImg').src=item.image;
-      document.getElementById('mTitle').textContent=item.title||'';
-      document.getElementById('mMeta').textContent=item.dates||'';
-      document.getElementById('mReason').textContent=item.reason||'';
-      document.getElementById('mDesc').textContent=item.description||'';
-      document.getElementById('mImpacts').textContent=item.impacts||'';
-      document.getElementById('mRoles').textContent=item.roles||'';
-      const tags=document.getElementById('mTags'); tags.innerHTML='';
-      if(row.tags){ row.tags.split(/[,;]/).forEach(t=>{ const span=document.createElement('span'); span.className='chip'; span.textContent=t.trim(); tags.appendChild(span); }); }
-      const links=document.getElementById('mLinks'); links.innerHTML='';
-      if(item.links){ item.links.split(';').forEach(l=>{ if(l){ const a=document.createElement('a'); a.className='btn'; a.target='_blank'; a.rel='noopener'; a.href=l.trim(); a.textContent='Learn more'; links.appendChild(a);} }); }
-      modal.showModal();
+      btn.setAttribute('aria-label', `Open project: ${item.title}`);
+      btn.addEventListener('click', (e) => { e.preventDefault(); openModalBySlug(item.slug); });
+
+      grid.appendChild(node);
     }
+  }
+
+  // ==== Modal Logic ====
+  const dialog = document.getElementById('project-modal');
+  const titleOut = document.getElementById('modal-title');
+
+  // field containers + outputs
+  const fieldReason = document.getElementById('field-reason');
+  const fieldDesc   = document.getElementById('field-description');
+  const fieldImp    = document.getElementById('field-impacts');
+  const fieldRoles  = document.getElementById('field-roles');
+  const fieldDates  = document.getElementById('field-dates');
+
+  const reasonOut = document.getElementById('modal-reason');
+  const descOut   = document.getElementById('modal-description');
+  const impOut    = document.getElementById('modal-impacts');
+  const rolesOut  = document.getElementById('modal-roles');
+  const datesOut  = document.getElementById('modal-dates');
+  const linksOut  = document.getElementById('modal-links');
+
+  const closeBtn = dialog.querySelector('[data-close]');
+  closeBtn.addEventListener('click', closeModal);
+  dialog.addEventListener('cancel', (e) => { e.preventDefault(); closeModal(); }); // ESC
+  dialog.addEventListener('click', (e) => { if(e.target === dialog) closeModal(); });
+
+  function setField(container, el, value){
+    if(value && String(value).trim() !== ''){
+      container.style.display = '';
+      el.textContent = value;
+    }else{
+      container.style.display = 'none';
+      el.textContent = '';
+    }
+  }
+
+  function fillModal(item){
+    titleOut.textContent = item.title || 'Untitled';
+    setField(fieldReason, reasonOut, item.reason);
+    setField(fieldDesc,   descOut,   item.description);
+    setField(fieldImp,    impOut,    item.impacts);
+    setField(fieldRoles,  rolesOut,  item.roles);
+
+    // Dates display remains simple (not requested to title)
+    if(item.dates && item.dates.trim() !== ''){
+      fieldDates.style.display = '';
+      datesOut.textContent = `Dates: ${item.dates}`;
+    }else{
+      fieldDates.style.display = 'none';
+      datesOut.textContent = '';
+    }
+
+    linksOut.innerHTML = '';
+    for(const link of parseLinks(item.links)){
+      const a = document.createElement('a');
+      a.target = '_blank'; a.rel = 'noopener';
+      a.href = link.url; a.textContent = link.label;
+      linksOut.appendChild(a);
+    }
+  }
+
+  function openModalBySlug(slug){
+    const item = PROJECTS.find(p => p.slug === slug);
+    if(!item) return;
+    fillModal(item);
+    if(location.hash !== `#/project/${slug}`){
+      PREV_HASH = location.hash;
+      location.hash = `#/project/${slug}`;
+    }
+    if(!dialog.open){ dialog.showModal(); }
+    trapFocus(dialog);
+  }
+
+  function closeModal(){
+    if(dialog.open) dialog.close();
+    if(PREV_HASH && PREV_HASH !== `#/project/${getHashSlug()}`){
+      location.hash = PREV_HASH;
+    } else if(location.hash.startsWith('#/project/')){
+      history.pushState('', document.title, window.location.pathname + window.location.search);
+    }
+  }
+
+  function getHashSlug(){
+    const m = location.hash.match(/^#\/project\/([^\s?#]+)/);
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+
+  window.addEventListener('hashchange', () => {
+    const slug = getHashSlug();
+    if(slug){ openModalBySlug(slug); }
+    else { if(dialog.open) dialog.close(); }
+  });
+
+  // Focus trap
+  function trapFocus(root){
+    const FOCUSABLE = 'a[href],button:not([disabled]),textarea,input,select,details,[tabindex]:not([tabindex="-1"])';
+    const focusables = [...root.querySelectorAll(FOCUSABLE)].filter(el => el.offsetParent !== null);
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if(first) first.focus();
+    function onKey(e){
+      if(e.key !== 'Tab') return;
+      if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+      else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+    }
+    root.addEventListener('keydown', onKey, { once: true });
+  }
+
+  // ==== Boot ====
+  async function boot(){
+    try{
+      if(location.protocol === 'file:'){
+        console.warn('Tip: serve this over http(s) (e.g., python3 -m http.server) so cross-origin fetch works reliably.');
+      }
+      if(!CSV_URL){ console.warn('CSV_URL is empty. Set it in config.js or pass ?csv=...'); }
+
+      let text;
+      try {
+        const res = await fetch(CSV_URL); // direct fetch
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        text = await res.text();
+      } catch (e) {
+        console.warn('Direct CSV fetch failed, trying CORS proxy…', e);
+        const proxied = `https://api.allorigins.win/raw?url=${encodeURIComponent(CSV_URL)}`;
+        const res2 = await fetch(proxied);
+        if (!res2.ok) throw new Error(`HTTP ${res2.status} via proxy`);
+        text = await res2.text();
+      }
+
+      const rows = parseCSV(text);
+      hydrate(rows);
+    } catch(err){
+      console.error(err);
+      const grid = document.getElementById('grid');
+      const msg = `Could not load projects. ${err && err.message ? '('+err.message+')' : ''}`;
+      grid.innerHTML = `<div style="padding:12px;border:1px solid var(--border);border-radius:12px;background:#fff">
+        <p>${msg}</p>
+        <p><small>CSV_URL:</small> <code>${CSV_URL}</code></p>
+        <p><small>Tips:</small> Publish the Sheet to the web as CSV; test the link in a new tab; and serve this file over http(s). A temporary proxy (api.allorigins.win) is used if CORS blocks direct fetch.</p>
+      </div>`;
+    }
+  }
+
+  function hydrate(rows){
+    const pick = (r, names) => pickField(r, names);
+    PROJECTS = rows.map(r => {
+      const image = pick(r,['image','Image','image_url','image url','img','thumbnail','thumb','Image (image file)','image (image file)']);
+      const title = pick(r,['title','Title','overlay','overlay text','name']);
+      const reason = pick(r,['reason','Reason','subtitle','subheading','The Reason']);
+      const description = pick(r,['description','Description','desc']);
+      const impacts = pick(r,['impacts','Impacts','impact']);
+      const dates = pick(r,['dates','Dates','date','year']);
+      const roles = pick(r,['roles','Roles','role']);
+      const links = pick(r,['links','Links']);
+      const tags = pick(r,['tags','Tags']);
+      const slug = pick(r,['slug','Slug','id','ID']);
+      const publishedRaw = pick(r,['published','Published','publish','Publish']);
+      const orderRaw = pick(r,['order_weight','order','Order','weight','Weight']);
+      return {
+        slug,image,title,reason,description,impacts,dates,roles,links,tags,
+        order_weight: toNumber(orderRaw),
+        published: normalizeBool(publishedRaw)
+      };
+    })
+    .filter(p => p.published)
+    .sort((a,b) => (a.order_weight - b.order_weight) || String(a.title).localeCompare(String(b.title)));
+
+    renderGrid(PROJECTS);
+
+    if(PROJECTS.length === 0){
+      grid.innerHTML = '<p>No published projects found. Check your Sheet headers and set <code>published</code> to TRUE.</p>';
+    }
+
+    const slug = getHashSlug();
+    if(slug) openModalBySlug(slug);
+  }
+
+  boot();
+
+  // Footer year
+  document.addEventListener('DOMContentLoaded', () => {
+    const y = document.getElementById('year');
+    if (y) y.textContent = new Date().getFullYear();
+  });
+
+  // Compact header on scroll
+  (() => {
+    const toggle = () => document.body.classList.toggle('is-scrolled', window.scrollY > 6);
+    toggle();
+    window.addEventListener('scroll', toggle, { passive: true });
+  })();
   </script>
+
+  <!-- Footer -->
+  <footer>
+    <div class="wrap">
+      <div class="footer-links" aria-label="Social links">
+        <a href="https://instagram.com/lonnygrafman" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://www.linkedin.com/in/lonnygrafman/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://www.facebook.com/LonnyG" target="_blank" rel="noopener">Facebook</a>
+        <a href="https://www.youtube.com/user/LonnyGrafman" target="_blank" rel="noopener">YouTube</a>
+      </div>
+      <div class="footer-copy">© <span id="year"></span> Lonny Grafman</div>
+    </div>
+  </footer>
+
+  <!-- GA4 (optional): paste your GA snippet here when deploying) -->
 </body>
 </html>
