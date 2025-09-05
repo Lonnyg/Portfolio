@@ -279,6 +279,22 @@ aboutPanel?.addEventListener('click', (e) => {
       });
     })();
 
+    // ===== Mobile long-press on portrait triggers punk mode =====
+(function(){
+  const portrait = document.querySelector('.hero__portrait');
+  if(!portrait) return;
+
+  let pressTimer;
+  portrait.addEventListener('touchstart', () => {
+    pressTimer = setTimeout(() => {
+      document.documentElement.classList.add('punk');
+      setTimeout(()=>document.documentElement.classList.remove('punk'), 10000); // auto reset
+    }, 1200); // hold for 1.2s
+  });
+  portrait.addEventListener('touchend', () => clearTimeout(pressTimer));
+  portrait.addEventListener('touchmove', () => clearTimeout(pressTimer));
+})();
+
     // ===== CSV Loader =====
     const CSV_URL = new URLSearchParams(location.search).get('csv')
       || (window.PORTFOLIO_CONFIG && window.PORTFOLIO_CONFIG.CSV_URL)
