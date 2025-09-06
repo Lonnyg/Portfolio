@@ -146,6 +146,29 @@
     @keyframes crt { 50% { transform: translateY(.3px) } }
 
     @media (max-width:860px){ .modal__dialog{grid-template-columns:1fr;} }
+
+@media (max-width: 600px) {
+  .about {
+    inset: 0 !important;
+    border-radius: 0 !important;
+    padding: 14px !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    box-shadow: none !important;
+    overflow-y: auto !important;
+  }
+  .about__img {
+    max-height: 180px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+  }
+  .about__text {
+    font-size: 1rem;
+  }
+}
+
   </style>
 </head>
 <body>
