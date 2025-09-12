@@ -59,12 +59,12 @@
   align-items:center;
   margin-top:10px;
 }
-.hero__portrait{
-  width:96px; height:96px; border-radius:16px; object-fit:cover;
-  border:1px solid var(--line);
-  cursor:pointer;
-  transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
-}
+  .hero__portrait{
+    width:96px; height:96px; border-radius:16px; object-fit:cover; object-position:top;
+    border:1px solid var(--line);
+    cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  }
 .hero__portrait:hover{
   transform:translateY(-2px);
   border-color: color-mix(in oklab, var(--accent) 50%, var(--line));
@@ -111,7 +111,7 @@
       box-shadow:0 20px 60px rgba(0,0,0,.4);
     }
     .about[hidden]{display:none;}
-    .about__img{width:100%; height:100%; object-fit:cover; border-radius:16px;}
+      .about__img{width:100%; height:100%; object-fit:cover; object-position:top; border-radius:16px;}
     .about__close{position:absolute; top:12px; right:12px; font-size:24px; background:transparent; border:0; color:var(--text); cursor:pointer;}
 
     .modal{position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.5); padding:24px;}
@@ -147,8 +147,8 @@
 
     @media (max-width:860px){ .modal__dialog{grid-template-columns:1fr;} }
 
-@media (max-width: 600px) {
-  .about {
+  @media (max-width: 600px) {
+    .about {
     inset: 0 !important;
     border-radius: 0 !important;
     padding: 14px !important;
@@ -158,16 +158,17 @@
     max-height: 100vh !important;
     box-shadow: none !important;
     overflow-y: auto !important;
+    }
+    .about__img {
+      max-height: 180px;
+      height: auto;
+      border-radius: 12px;
+      margin-bottom: 12px;
+    }
+    .about__text {
+      font-size: 1rem;
+    }
   }
-  .about__img {
-    max-height: 180px;
-    border-radius: 12px;
-    margin-bottom: 12px;
-  }
-  .about__text {
-    font-size: 1rem;
-  }
-}
 
   </style>
 </head>
