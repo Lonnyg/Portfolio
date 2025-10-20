@@ -23,13 +23,16 @@
 
   <style>
     :root{
-      --bg:#000000; --text:#e7e7e7; --muted:#a0a0a0;
+      --bg:#0b0c0c; --text:#e7e7e7; --muted:#a0a0a0;
       --card:#141515; --line:#1f2020;
-      --accent:#ff3fd7; /* bright pink */
+      --accent:#39ff14; /* neon moss */
       --radius:18px; --pad:18px; --gap:18px; --max:1080px;
       color-scheme: dark light;
     }
     html.punk{
+      --bg:#050505;
+      --card:#101010;
+      --line:#1c1c1c;
       --accent:#ff3fd7; /* electric pink */
     }
     @media (prefers-color-scheme: light){
@@ -68,16 +71,15 @@
     cursor:pointer;
     transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
   }
-.hero__portrait:hover{
-  transform:translateY(-2px);
-  border-color: color-mix(in oklab, var(--accent) 50%, var(--line));
-  box-shadow:0 8px 22px rgba(0,0,0,.25);
- 
+  .hero__portrait:hover{
+    transform:translateY(-2px);
+    border-color: color-mix(in oklab, var(--accent) 50%, var(--line));
+    box-shadow:0 8px 22px rgba(0,0,0,.25);
+  }
   html.punk .hero__portrait{
-  box-shadow:0 0 12px var(--accent), 0 0 24px var(--accent);
-  border-color: var(--accent);
-}
-}
+    box-shadow:0 0 12px var(--accent), 0 0 24px var(--accent);
+    border-color: var(--accent);
+  }
 @media (max-width:640px){
   .hero__intro{
     grid-template-columns: 1fr auto;
@@ -155,8 +157,9 @@
     /* Punk mode (Konami) */
 /* ===== Retro CRT Pack — toggle with <html class="punk"> ===== */
 html.punk body {
+  background:var(--bg);
   /* Pop the colors a bit like a phosphor glow */
-  filter: contrast(1.18) saturate(1.28) brightness(1.06);
+  filter: contrast(1.2) saturate(1.32);
   transform: translateZ(0); /* kick in GPU */
   animation: crt-jitter 0.085s steps(2, end) infinite;
   position: relative;
@@ -229,9 +232,59 @@ html.punk body::before {
 /* ----- Optional: very subtle bloom for bright areas ----- */
 /* Keeps it gentle so text stays readable. Turn up blur/opacity for wilder bloom. */
 html.punk .crt-bloom {
-  filter: blur(0.6px) brightness(1.08) saturate(1.2);
+  filter: blur(0.6px) brightness(1.05) saturate(1.2);
   opacity: 0.25;
   pointer-events: none;
+}
+
+html.punk .card__overlay{
+  background:none;
+  color:var(--accent);
+  text-shadow:0 0 6px rgba(0,0,0,.75), 0 0 14px rgba(255,63,215,.6);
+}
+
+html.punk .card:hover .card__overlay{background:none;}
+
+html.punk .card img{
+  animation: punk-glitch-img 0.6s steps(2, end) infinite;
+  position:relative;
+  filter: saturate(1.4) hue-rotate(-4deg);
+}
+
+@keyframes punk-glitch-img{
+  0%{transform:translate(0,0); clip-path:inset(0 0 0 0);}
+  25%{transform:translate(-1px,1px); clip-path:inset(0 0 4% 0);
+    filter:hue-rotate(6deg) saturate(1.6);}
+  50%{transform:translate(1px,-1px); clip-path:inset(3% 0 0 0);
+    filter:hue-rotate(-8deg) saturate(1.5);}
+  75%{transform:translate(-0.5px,0.5px); clip-path:inset(0 0 2% 0);
+    filter:hue-rotate(4deg) saturate(1.55);}
+  100%{transform:translate(0,0); clip-path:inset(0 0 0 0);}
+}
+
+html.punk .card::before,
+html.punk .card::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  mix-blend-mode:screen;
+  pointer-events:none;
+  opacity:.12;
+  background:linear-gradient(90deg,rgba(255,63,215,.4),transparent 45%,rgba(63,255,214,.35));
+  animation: punk-glitch-overlay 0.8s steps(2,end) infinite;
+}
+
+html.punk .card::after{
+  background:linear-gradient(0deg,rgba(63,255,214,.4),transparent 55%,rgba(255,63,215,.35));
+  animation-delay:.2s;
+}
+
+@keyframes punk-glitch-overlay{
+  0%{transform:translate(0,0); opacity:.18;}
+  40%{transform:translate(-1px,1px); opacity:.26;}
+  55%{transform:translate(1px,-1px); opacity:.2;}
+  70%{transform:translate(2px,0); opacity:.28;}
+  100%{transform:translate(0,0); opacity:.18;}
 }
 
 /* Example: Wrap your main app in a container, duplicate it as a bloom layer:
