@@ -29,6 +29,9 @@
       --radius:18px; --pad:18px; --gap:18px; --max:1080px;
       color-scheme: dark light;
     }
+    html.punk{
+      --accent:#ff3fd7; /* electric pink */
+    }
     @media (prefers-color-scheme: light){
       :root{ --bg:#ffffff; --text:#111; --muted:#565656; --card:#f8f8f8; --line:#eaeaea; }
     }
@@ -208,9 +211,9 @@ html.punk body::before {
   z-index: 9999;
   /* Three gentle color washes blended together */
   background:
-    linear-gradient(90deg, rgba(255,0,0,0.06), rgba(255,0,0,0.00)),
-    linear-gradient(90deg, rgba(0,255,0,0.06), rgba(0,255,0,0.00)),
-    linear-gradient(90deg, rgba(0,0,255,0.06), rgba(0,0,255,0.00));
+    linear-gradient(120deg, rgba(255,63,215,0.14), rgba(255,63,215,0.00)),
+    linear-gradient(240deg, rgba(255,140,255,0.12), rgba(255,140,255,0.00)),
+    linear-gradient( 60deg, rgba(168,84,255,0.10), rgba(168,84,255,0.00));
   mix-blend-mode: screen;
   animation: rgb-shift 0.12s steps(2, end) infinite;
   will-change: transform;
