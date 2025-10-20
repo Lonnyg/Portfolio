@@ -150,9 +150,104 @@
     @media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important} }
 
     /* Punk mode (Konami) */
-    html.punk{ --accent:#ff2dfb; filter:contrast(1.03) saturate(1.08);}
-    html.punk body{ animation:crt 0.12s steps(2,end) infinite;}
-    @keyframes crt { 50% { transform: translateY(.3px) } }
+/* ===== Retro CRT Pack — toggle with <html class="punk"> ===== */
+html.punk body {
+  /* Pop the colors a bit like a phosphor glow */
+  filter: contrast(1.18) saturate(1.28) brightness(1.06);
+  transform: translateZ(0); /* kick in GPU */
+  animation: crt-jitter 0.085s steps(2, end) infinite;
+  position: relative;
+}
+
+/* Horizontal + vertical micro-jitter and tiny breathing scale */
+@keyframes crt-jitter {
+  0%   { transform: translate(0.3px, 0.2px) scale(1.001); }
+  50%  { transform: translate(-0.4px, -0.3px) scale(1.002); }
+  100% { transform: translate(0.2px, -0.1px) scale(1.001); }
+}
+
+/* ----- Overlay: scanlines + subtle vignette + micro flicker ----- */
+html.punk body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  /* 1) scanlines  2) faint vignette  3) slight glass glare */
+  background:
+    /* scanlines */
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.12) 0px,
+      rgba(0,0,0,0.12) 1px,
+      rgba(0,0,0,0.00) 2px,
+      rgba(0,0,0,0.00) 3px
+    ),
+    /* vignette */
+    radial-gradient(ellipse at center,
+      rgba(0,0,0,0.00) 40%,
+      rgba(0,0,0,0.15) 80%)
+    ;
+  mix-blend-mode: multiply;
+  animation: crt-flicker 1.6s steps(2, end) infinite;
+  will-change: opacity, transform;
+}
+
+@keyframes crt-flicker {
+  0%, 100% { opacity: 0.9; }
+  50%      { opacity: 1; }
+}
+
+/* ----- Overlay: RGB subpixel drift / chromatic aberration ----- */
+/* This simulates the triad phosphors sliding a hair */
+html.punk body::before {
+  content: "";
+  position: fixed;
+  inset: -1px; /* tiny bleed to hide edges during shifts */
+  pointer-events: none;
+  z-index: 9999;
+  /* Three gentle color washes blended together */
+  background:
+    linear-gradient(90deg, rgba(255,0,0,0.06), rgba(255,0,0,0.00)),
+    linear-gradient(90deg, rgba(0,255,0,0.06), rgba(0,255,0,0.00)),
+    linear-gradient(90deg, rgba(0,0,255,0.06), rgba(0,0,255,0.00));
+  mix-blend-mode: screen;
+  animation: rgb-shift 0.12s steps(2, end) infinite;
+  will-change: transform;
+}
+
+/* Slight horizontal drift to fake channel misalignment */
+@keyframes rgb-shift {
+  0%   { transform: translateX(0.0px); }
+  50%  { transform: translateX(0.6px); }
+  100% { transform: translateX(-0.4px); }
+}
+
+/* ----- Optional: very subtle bloom for bright areas ----- */
+/* Keeps it gentle so text stays readable. Turn up blur/opacity for wilder bloom. */
+html.punk .crt-bloom {
+  filter: blur(0.6px) brightness(1.08) saturate(1.2);
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+/* Example: Wrap your main app in a container, duplicate it as a bloom layer:
+   <div class="app">
+     ...content...
+     <div class="app crt-bloom"></div>  // position this absolutely on top
+   </div>
+   Positioning is app/layout specific, so this class is optional.
+*/
+
+/* ----- Respect reduced motion ----- */
+@media (prefers-reduced-motion: reduce) {
+  html.punk body,
+  html.punk body::before,
+  html.punk body::after {
+    animation: none !important;
+    transform: none !important;
+  }
+}
 
     @media (max-width:860px){ .modal__dialog{grid-template-columns:1fr;} }
 
