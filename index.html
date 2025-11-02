@@ -85,8 +85,31 @@
 
     
     .grid{display:grid; gap:var(--gap); grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); margin-top:1rem;}
-    .card{position:relative; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;}
-    .card:hover{transform:translateY(-4px); border-color:color-mix(in oklab,var(--accent) 50%,var(--line)); box-shadow:0 10px 30px rgba(0,0,0,.2);}
+    .card{
+      position:relative; background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+      overflow:hidden; cursor:pointer; transform:translateY(0);
+      box-shadow:0 10px 26px rgba(0,0,0,.18);
+      transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease, filter .25s ease;
+    }
+    .card::before{
+      content:""; position:absolute; inset:10px; border-radius:calc(var(--radius) - 10px);
+      background:radial-gradient(circle at 50% 20%, rgba(255,255,255,.18), transparent 60%);
+      opacity:0; transform:translateY(6px) scale(.98);
+      transition:opacity .25s ease, transform .25s ease;
+      pointer-events:none; mix-blend-mode:screen;
+    }
+    .card:hover,
+    .card:focus-visible,
+    .card:focus-within{
+      transform:translateY(-10px) scale(1.01);
+      border-color:color-mix(in oklab,var(--accent) 55%,var(--line));
+      box-shadow:0 22px 46px rgba(0,0,0,.35);
+      filter:saturate(1.05);
+    }
+    .card:hover::before,
+    .card:focus-visible::before,
+    .card:focus-within::before{opacity:1; transform:translateY(0) scale(1);}
+    .card:focus-visible{outline:2px solid color-mix(in oklab,var(--accent) 80%, transparent); outline-offset:4px;}
     .card img{display:block; width:100%; height:220px; object-fit:cover;}
     .card__overlay{
       position:absolute; left:0; right:0; bottom:0;
@@ -602,11 +625,17 @@ aboutPanel?.addEventListener('click', (e) => {
     }
 
     function buildCard(item){
-      const el = document.createElement('article'); el.className='card';
+      const el = document.createElement('article'); el.className='card'; el.tabIndex = 0;
       const img = document.createElement('img'); img.loading='lazy'; img.alt = item.title || 'Project image'; img.src = normalizeImage(item.image) || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450"><rect width="100%" height="100%" fill="%23141515"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23a0a0a0" font-family="IBM Plex Mono" font-size="16">Image unavailable</text></svg>';
       const overlay = document.createElement('div'); overlay.className='card__overlay'; overlay.textContent = item.title || '(Untitled)';
       el.append(img, overlay);
       el.addEventListener('click', ()=> openModal(item));
+      el.addEventListener('keydown', (event)=>{
+        if(event.key === 'Enter' || event.key === ' '){
+          event.preventDefault();
+          openModal(item);
+        }
+      });
       return el;
     }
 
